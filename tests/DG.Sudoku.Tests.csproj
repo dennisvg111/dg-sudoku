@@ -28,6 +28,6 @@
 	  </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\DG-Sudoku.csproj" />
+    <ProjectReference Include="..\src\DG.Sudoku.csproj" />
   </ItemGroup>
 </Project>
