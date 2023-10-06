@@ -10,7 +10,8 @@ namespace DG.Sudoku
         public const int SideLength = CellDigit.MaxValue;
         public static readonly int RegionSize = (int)Math.Sqrt(SideLength);
         private const int BoardSize = SideLength * SideLength;
-        private Cell[] _cells;
+
+        private readonly Cell[] _cells;
 
         public Board() : this(Enumerable.Range(0, BoardSize).Select(i => Cell.ForUnkown(i % SideLength, (int)Math.Floor(i / (double)SideLength))).ToArray()) { }
 
@@ -26,13 +27,13 @@ namespace DG.Sudoku
 
         public Cell this[int x, int y] => _cells[y * SideLength + x];
 
-        public Cell this[CellPosition i] => this[i.X, i.Y];
+        public Cell this[Position i] => this[i.X, i.Y];
 
         public IEnumerable<Cell> GetCellsInColumn(Column x, params Cell[] exclude)
         {
             for (int y = 0; y < SideLength; y++)
             {
-                if (exclude.Any(c => c.X == (int)x && c.Y == y))
+                if (exclude.Any(c => c.Position.X == (int)x && c.Position.Y == y))
                 {
                     continue;
                 }
@@ -44,7 +45,7 @@ namespace DG.Sudoku
         {
             for (int x = 0; x < SideLength; x++)
             {
-                if (exclude.Any(c => c.Y == (int)y && c.X == x))
+                if (exclude.Any(c => c.Position.Y == (int)y && c.Position.X == x))
                 {
                     continue;
                 }
@@ -60,7 +61,7 @@ namespace DG.Sudoku
             {
                 for (int x = offsetX; x < offsetX + RegionSize; x++)
                 {
-                    if (exclude.Any(c => c.Y == y && c.X == x))
+                    if (exclude.Any(c => c.Position.Y == y && c.Position.X == x))
                     {
                         continue;
                     }
@@ -88,11 +89,11 @@ namespace DG.Sudoku
         {
             foreach (var otherCell in _cells)
             {
-                if (otherCell.X == cell.X && otherCell.Y == cell.Y)
+                if (otherCell.Position.X == cell.Position.X && otherCell.Position.Y == cell.Position.Y)
                 {
                     continue;
                 }
-                if (otherCell.X == cell.X || otherCell.Y == cell.Y || otherCell.Box == cell.Box)
+                if (otherCell.Position.X == cell.Position.X || otherCell.Position.Y == cell.Position.Y || otherCell.Position.Box == cell.Position.Box)
                 {
                     yield return otherCell;
                 }

@@ -1,6 +1,11 @@
-﻿namespace DG.Sudoku
+﻿using System;
+
+namespace DG.Sudoku
 {
-    public class CellDigit
+    /// <summary>
+    /// This class represents the digit possibilities for a <see cref="Cell"/>.
+    /// </summary>
+    public sealed class CellDigit : IEquatable<CellDigit>
     {
         /// <summary>
         /// 9
@@ -8,7 +13,7 @@
         public const int MaxValue = 9;
 
         // Additional bits track state (lower-case to avoid conflicts)
-        internal const short KnownMask = (1 << 0);
+        private const short KnownMask = (1 << 0);
         internal const short GivenMask = (1 << 10);
         internal const short GuessMask = (1 << 11);
 
@@ -37,9 +42,22 @@
         /// </summary>
         public bool IsExhausted => ValueBits == 0;
 
-        public CellDigit(short bits)
+        /// <summary>
+        /// Creates a new instance of <see cref="CellDigit"/>.
+        /// </summary>
+        /// <param name="bits"></param>
+        internal CellDigit(short bits)
         {
             _bits = bits;
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="CellDigit"/> with the same digit knowledge.
+        /// </summary>
+        /// <returns></returns>
+        public CellDigit Copy()
+        {
+            return new CellDigit(_bits);
         }
 
         /// <summary>
@@ -52,27 +70,40 @@
             _bits &= (short)~(1 << digit);
         }
 
-        public ValueKind DigitKind
+        /// <summary>
+        /// Indicates what kind of digit this is.
+        /// </summary>
+        public DigitKnowledge Type
         {
             get
             {
                 if (0 != (GivenMask & _bits))
                 {
-                    return ValueKind.Given;
+                    return DigitKnowledge.Given;
                 }
                 if (0 != (GuessMask & _bits))
                 {
-                    return ValueKind.Guess;
+                    return DigitKnowledge.Guess;
                 }
-                return ValueKind.Normal;
+                return DigitKnowledge.Normal;
             }
         }
 
+        /// <summary>
+        /// Indicates if this digit could be equal to the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public bool CouldBe(int value)
         {
-            return IsValueBitSet(_bits, value);
+            return _bits.CanBeDigit(value);
         }
 
+        /// <summary>
+        /// Indicates if this digit has only one possible value, and returns the possible value as <paramref name="optionFound"/>.
+        /// </summary>
+        /// <param name="optionFound"></param>
+        /// <returns></returns>
         public bool HasSingleOption(out int optionFound)
         {
             optionFound = 0;
@@ -86,22 +117,36 @@
             return true;
         }
 
-        public bool TrySetValue(int value, ValueKind kind)
+        /// <summary>
+        /// Tries to set this digit to the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool TrySetValue(int value)
         {
             if (IsKnown && (value != KnownValue))
             {
                 return false;
             }
             // Set bits to reflect known value of specified kind
-            _bits = (short)((1 << value) | KnownMask | (int)kind);
+            _bits = (short)((1 << value) | KnownMask | GuessMask);
             return true;
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="CellDigit"/> for a specific digit.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static CellDigit ForKnown(int value)
         {
             return new CellDigit((short)((1 << value) | KnownMask | GivenMask));
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="CellDigit"/> where the underlying digit is not known.
+        /// </summary>
+        /// <returns></returns>
         public static CellDigit ForUnknown()
         {
             return new CellDigit(_unkownMask);
@@ -110,6 +155,17 @@
         private static int Log2n(int n)
         {
             return (n > 1) ? 1 + Log2n(n / 2) : 0;
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(CellDigit other)
+        {
+            return _bits == other._bits;
+        }
+
+        public override string ToString()
+        {
+            return IsKnown ? KnownValue.ToString() : "?";
         }
     }
 }
