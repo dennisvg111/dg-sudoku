@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DG.Sudoku", "src\DG.Sudoku.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DG.Sudoku.Tests", "tests\DG.Sudoku.Tests.csproj", "{C88E68E7-E060-4800-BCF8-98C631F3C809}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DG.Sudoku.Console", "console\DG.Sudoku.Console.csproj", "{6655205A-557D-4C88-8FE7-7098060AB496}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C88E68E7-E060-4800-BCF8-98C631F3C809}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C88E68E7-E060-4800-BCF8-98C631F3C809}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C88E68E7-E060-4800-BCF8-98C631F3C809}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6655205A-557D-4C88-8FE7-7098060AB496}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6655205A-557D-4C88-8FE7-7098060AB496}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6655205A-557D-4C88-8FE7-7098060AB496}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6655205A-557D-4C88-8FE7-7098060AB496}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

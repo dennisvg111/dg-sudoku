@@ -3,7 +3,7 @@
 		<ProjectGuid>{8EB0712B-DBC3-47E1-AA93-87C6AA1B8D71}</ProjectGuid>
 		<TargetFramework>net452</TargetFramework>
 		<AssemblyTitle>DG.Sudoku</AssemblyTitle>
-		<AssemblyVersion>0.1.0</AssemblyVersion>
+		<AssemblyVersion>0.3.1</AssemblyVersion>
 		<Product>DG.Sudoku</Product>
 		<Copyright>Copyright ©  2023</Copyright>
 		<OutputPath>bin\$(Configuration)\</OutputPath>
@@ -47,6 +47,9 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Dennisvg.DG.Common" Version="1.11.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="System.Data.DataSetExtensions" />
