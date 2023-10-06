@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DG.Sudoku.SolvingStrategies;
+using System;
+using System.Threading;
 using Output = System.Console;
 
 namespace DG.Sudoku.Console
@@ -15,7 +17,16 @@ namespace DG.Sudoku.Console
                 Output.WriteLine("Could not parse board from given input");
                 Output.WriteLine("\"" + input + "\"");
             }
-            DrawDetailedBoard(board);
+
+            Solver solver = new Solver(new PropagationSolver(), new SolvingPipeline());
+
+            do
+            {
+                DrawDetailedBoard(board);
+                Thread.Sleep(500);
+            } while (solver.NextStep(board));
+            Output.Clear();
+            Output.WriteLine("Could not find more solving steps"); ;
         }
 
         private static void DrawBoard(Board board)
