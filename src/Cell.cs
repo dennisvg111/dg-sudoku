@@ -17,23 +17,24 @@
 
         public Cell Copy()
         {
+            //position is read-only so we don't need to copy it.
             return new Cell(_position, _digit.Copy());
         }
 
         public static Cell ForKnown(int x, int y, int digit)
         {
-            return new Cell(x, y, CellDigit.ForKnown(digit));
+            return new Cell(Position.For(x, y), CellDigit.ForKnown(digit));
         }
 
         public static Cell ForUnkown(int x, int y)
         {
-            return new Cell(x, y, CellDigit.ForUnknown());
+            return new Cell(Position.For(x, y), CellDigit.ForUnknown());
         }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return $"{_x + 1},{_y + 1}: {(_digit.IsKnown ? _digit.KnownValue.ToString() : "?")}";
+            return $"{Position.X + 1},{Position.Y + 1}: {(_digit.IsKnown ? _digit.KnownValue.ToString() : "?")}";
         }
     }
 }

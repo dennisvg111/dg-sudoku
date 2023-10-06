@@ -36,6 +36,17 @@ namespace DG.Sudoku
             _box = (x / 3) + ((y / 3) * 3);
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="Position"/> with the given x and y index.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static Position For(int x, int y)
+        {
+            return new Position(x, y);
+        }
+
         internal int GetIndex(UnitType unit)
         {
             switch (unit)
