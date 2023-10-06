@@ -83,9 +83,9 @@ namespace DG.Sudoku
                 }
                 if (0 != (GuessMask & _bits))
                 {
-                    return DigitKnowledge.Guess;
+                    return DigitKnowledge.Guessed;
                 }
-                return DigitKnowledge.Normal;
+                return DigitKnowledge.Unknown;
             }
         }
 

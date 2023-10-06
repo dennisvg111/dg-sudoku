@@ -5,8 +5,8 @@
     /// </summary>
     public enum DigitKnowledge
     {
-        Normal,
+        Unknown,
         Given,
-        Guess
+        Guessed
     }
 }

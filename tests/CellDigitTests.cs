@@ -40,6 +40,30 @@ namespace DG.Sudoku.Tests
             Assert.True(value.CouldBe(2));
             Assert.True(value.CouldBe(3));
             Assert.True(value.CouldBe(7));
+
+            Assert.False(value.HasSingleOption(out int _));
+
+            value.Exclude(2);
+            value.Exclude(3);
+            value.Exclude(5);
+            value.Exclude(6);
+            value.Exclude(7);
+
+            Assert.False(value.IsKnown);
+            Assert.True(value.HasSingleOption(out int _));
+        }
+
+        [Fact]
+        public void TrySetValue_MakesTypeGuess()
+        {
+            var value = CellDigit.ForUnknown();
+
+            value.Exclude(1);
+            value.Exclude(4);
+            value.Exclude(9);
+            value.TrySetValue(5);
+
+            Assert.Equal(DigitKnowledge.Guessed, value.Type);
         }
     }
 }
