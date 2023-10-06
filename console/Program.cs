@@ -60,9 +60,8 @@ namespace DG.Sudoku.Console
                 {
                     Output.ForegroundColor = ConsoleColor.Blue;
                 }
-                Output.Write(isPossible ? digitToCheck.ToString() : " ");
+                Output.Write(isPossible ? (digitToCheck + " ") : "  ");
                 Output.ForegroundColor = defaultColor;
-                Output.Write(" ");
             }
             Output.Write(" ");
         }
