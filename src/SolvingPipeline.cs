@@ -26,7 +26,7 @@ namespace DG.Sudoku
             return new SolvingPipeline(_strategies);
         }
 
-        public bool TryPipeline(Board board, out string usedStrategy, out IEnumerable<ValueInCell> valuesToRemove)
+        public bool TryPipeline(Board board, out string usedStrategy, out IEnumerable<PossibleDigitInCell> valuesToRemove)
         {
             usedStrategy = string.Empty;
             foreach (var strategy in _strategies)
@@ -37,7 +37,7 @@ namespace DG.Sudoku
                     return true;
                 }
             }
-            valuesToRemove = Enumerable.Empty<ValueInCell>();
+            valuesToRemove = Enumerable.Empty<PossibleDigitInCell>();
             return false;
         }
 

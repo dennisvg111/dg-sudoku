@@ -1,4 +1,5 @@
-﻿using DG.Sudoku.Units;
+﻿using DG.Sudoku.CellData;
+using DG.Sudoku.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DG.Sudoku
+namespace DG.Sudoku.CellData
 {
     /// <summary>
     /// This class represents the digit possibilities for a <see cref="Cell"/>.
@@ -13,12 +13,12 @@ namespace DG.Sudoku
         public const int MaxValue = 9;
 
         // Additional bits track state (lower-case to avoid conflicts)
-        private const short KnownMask = (1 << 0);
-        internal const short GivenMask = (1 << 10);
-        internal const short GuessMask = (1 << 11);
+        private const short KnownMask = 1 << 0;
+        internal const short GivenMask = 1 << 10;
+        internal const short GuessMask = 1 << 11;
 
         // Digit Unknown state could be any value
-        private const int _unkownMask = (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5) | (1 << 6) | (1 << 7) | (1 << 8) | (1 << 9);
+        private const int _unkownMask = 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4 | 1 << 5 | 1 << 6 | 1 << 7 | 1 << 8 | 1 << 9;
 
         private short _bits;
 
@@ -108,7 +108,7 @@ namespace DG.Sudoku
         {
             optionFound = 0;
             var bitsToCheck = ValueBits;
-            bool singleOption = bitsToCheck > 0 && ((bitsToCheck & (bitsToCheck - 1)) == 0);
+            bool singleOption = bitsToCheck > 0 && (bitsToCheck & bitsToCheck - 1) == 0;
             if (!singleOption)
             {
                 return false;
@@ -124,12 +124,12 @@ namespace DG.Sudoku
         /// <returns></returns>
         public bool TrySetValue(int value)
         {
-            if (IsKnown && (value != KnownValue))
+            if (IsKnown && value != KnownValue)
             {
                 return false;
             }
             // Set bits to reflect known value of specified kind
-            _bits = (short)((1 << value) | KnownMask | GuessMask);
+            _bits = (short)(1 << value | KnownMask | GuessMask);
             return true;
         }
 
@@ -140,7 +140,7 @@ namespace DG.Sudoku
         /// <returns></returns>
         public static CellDigit ForKnown(int value)
         {
-            return new CellDigit((short)((1 << value) | KnownMask | GivenMask));
+            return new CellDigit((short)(1 << value | KnownMask | GivenMask));
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace DG.Sudoku
 
         private static int Log2n(int n)
         {
-            return (n > 1) ? 1 + Log2n(n / 2) : 0;
+            return n > 1 ? 1 + Log2n(n / 2) : 0;
         }
 
         /// <inheritdoc/>

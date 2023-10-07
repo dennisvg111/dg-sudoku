@@ -1,6 +1,7 @@
-﻿using Xunit;
+﻿using DG.Sudoku.CellData;
+using Xunit;
 
-namespace DG.Sudoku.Tests
+namespace DG.Sudoku.Tests.CellData
 {
     public class CellDigitTests
     {

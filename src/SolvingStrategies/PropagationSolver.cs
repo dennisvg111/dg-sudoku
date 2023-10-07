@@ -7,7 +7,7 @@ namespace DG.Sudoku.SolvingStrategies
         public string Name => "Propagation";
         public Difficulty Difficulty => Difficulty.Easy;
 
-        public IEnumerable<ValueInCell> FindValuesToRemove(Board board)
+        public IEnumerable<PossibleDigitInCell> FindValuesToRemove(Board board)
         {
             for (int x = 0; x < Board.SideLength; x++)
             {
@@ -19,7 +19,7 @@ namespace DG.Sudoku.SolvingStrategies
                         var cells = board.GetInfluencedCells(cell);
                         foreach (var otherCell in cells)
                         {
-                            yield return ValueInCell.For(otherCell.Position, cell.Digit.KnownValue);
+                            yield return PossibleDigitInCell.For(otherCell.Position, cell.Digit.KnownValue);
                         }
                     }
                 }

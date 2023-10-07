@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace DG.Sudoku
+namespace DG.Sudoku.CellData
 {
     public static class DigitOption
     {
@@ -9,7 +9,7 @@ namespace DG.Sudoku
 
         public static bool CanBeDigit(this short bits, int digit)
         {
-            return (bits & (1 << digit)) != 0;
+            return (bits & 1 << digit) != 0;
         }
 
         public static int[] GetOptions(this short bits)

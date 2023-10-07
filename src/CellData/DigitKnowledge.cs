@@ -1,4 +1,4 @@
-﻿namespace DG.Sudoku
+﻿namespace DG.Sudoku.CellData
 {
     /// <summary>
     /// Indicates if this digit is a regular digit, a guessed digit, or given by the puzzle.

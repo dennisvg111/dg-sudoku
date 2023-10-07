@@ -30,7 +30,7 @@ namespace DG.Sudoku
                 return true;
             }
 
-            if (_propagation.TryFindValuesToRemove(board, out IEnumerable<ValueInCell> valuesToRemove))
+            if (_propagation.TryFindValuesToRemove(board, out IEnumerable<PossibleDigitInCell> valuesToRemove))
             {
                 RemoveOptions(board, valuesToRemove);
                 return true;
@@ -46,12 +46,12 @@ namespace DG.Sudoku
             return false;
         }
 
-        private void RemoveOptions(Board board, IEnumerable<ValueInCell> valuesToRemove)
+        private void RemoveOptions(Board board, IEnumerable<PossibleDigitInCell> valuesToRemove)
         {
 
             foreach (var value in valuesToRemove)
             {
-                board[value.Position].Digit.Exclude(value.Value);
+                board[value.Position].Digit.Exclude(value.Digit);
             }
         }
 

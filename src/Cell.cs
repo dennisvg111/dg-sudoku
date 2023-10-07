@@ -1,4 +1,6 @@
-﻿namespace DG.Sudoku
+﻿using DG.Sudoku.CellData;
+
+namespace DG.Sudoku
 {
     public class Cell
     {

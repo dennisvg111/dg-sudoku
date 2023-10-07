@@ -1,4 +1,5 @@
-﻿using DG.Sudoku.SolvingStrategies;
+﻿using DG.Sudoku.CellData;
+using DG.Sudoku.SolvingStrategies;
 using System;
 using System.Threading;
 using Output = System.Console;
@@ -13,7 +14,7 @@ namespace DG.Sudoku.Console
         {
             Output.ForegroundColor = defaultColor;
 
-            string input = "...1.5...14....67..8...24...63.7..1.9.......3.1..9.52...72...8..26....35...4.9...";
+            string input = "2...7..38.....6.7.3...4.6....8.2.7..1.......6..7.3.4....4.8...9.6.4.....91..6...2";
             if (!Board.TryParse(input, out Board board))
             {
                 Output.WriteLine("Could not parse board from given input");

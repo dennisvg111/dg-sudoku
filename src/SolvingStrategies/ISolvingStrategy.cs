@@ -6,6 +6,6 @@ namespace DG.Sudoku.SolvingStrategies
     {
         string Name { get; }
         Difficulty Difficulty { get; }
-        IEnumerable<ValueInCell> FindValuesToRemove(Board board);
+        IEnumerable<PossibleDigitInCell> FindValuesToRemove(Board board);
     }
 }
