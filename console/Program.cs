@@ -48,7 +48,7 @@ namespace DG.Sudoku.Console
 
         private static void DrawDetailedBoard(Board board)
         {
-            Output.Clear();
+            Output.SetCursorPosition(0, 0);
             for (int y = 0; y < Board.SideLength; y++)
             {
                 for (int offset = 0; offset < 3; offset++)
@@ -62,6 +62,7 @@ namespace DG.Sudoku.Console
                 }
                 Output.WriteLine();
             }
+            DrawLegend();
         }
 
         private static void DrawDetailedCell(Cell cell, int optionsOffset)
@@ -69,8 +70,23 @@ namespace DG.Sudoku.Console
             for (int digit = 1; digit <= 3; digit++)
             {
                 var digitToCheck = digit + optionsOffset * 3;
-                var isPossible = cell.Digit.CouldBe(digitToCheck);
-                WriteToOutput(isPossible ? (digitToCheck + " ") : "  ", cell.Digit.Type);
+                if (cell.Digit.IsKnown)
+                {
+                    if (digitToCheck == 5)
+                    {
+                        WriteToOutput(cell.Digit.KnownValue.ToString(), cell.Digit.Type);
+                    }
+                    else
+                    {
+                        Output.Write(" ");
+                    }
+                }
+                else
+                {
+                    var isPossible = cell.Digit.CouldBe(digitToCheck);
+                    WriteToOutput(isPossible ? digitToCheck.ToString() : " ", cell.Digit.Type);
+                }
+                Output.Write(" ");
             }
             Output.Write(" ");
         }
@@ -87,6 +103,14 @@ namespace DG.Sudoku.Console
             }
             Output.Write(output);
             Output.ForegroundColor = defaultColor;
+        }
+
+        private static void DrawLegend()
+        {
+            WriteToOutput("[Given] ", DigitKnowledge.Given);
+            WriteToOutput("[Guessed] ", DigitKnowledge.Guessed);
+            WriteToOutput("[Unknown] ", DigitKnowledge.Unknown);
+            Output.WriteLine();
         }
     }
 }
