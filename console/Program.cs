@@ -30,22 +30,6 @@ namespace DG.Sudoku.Console
             Output.WriteLine("Could not find more solving steps"); ;
         }
 
-        private static void DrawBoard(Board board)
-        {
-            Output.Clear();
-            for (int y = 0; y < Board.SideLength; y++)
-            {
-                for (int x = 0; x < Board.SideLength; x++)
-                {
-                    var cell = board[x, y];
-                    WriteToOutput(cell.Digit.IsKnown ? cell.Digit.KnownValue.ToString() : "?", cell.Digit.Type);
-                    Output.Write("  ");
-                }
-                Output.WriteLine();
-                Output.WriteLine();
-            }
-        }
-
         private static void DrawDetailedBoard(Board board)
         {
             Output.SetCursorPosition(0, 0);
