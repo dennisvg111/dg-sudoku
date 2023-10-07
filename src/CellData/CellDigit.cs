@@ -163,6 +163,10 @@ namespace DG.Sudoku.CellData
             return _bits == other._bits;
         }
 
+        /// <summary>
+        /// Returns a string that represents the <see cref="KnownValue"/>, or a question mark.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return IsKnown ? KnownValue.ToString() : "?";
