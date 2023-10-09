@@ -1,16 +1,25 @@
-﻿using DG.Sudoku.SolvingStrategies;
+﻿using DG.Sudoku.Propagation;
+using DG.Sudoku.SolvingStrategies;
 using System.Collections.Generic;
 
 namespace DG.Sudoku
 {
+    /// <summary>
+    /// Solves sudoku puzzles by stepping through a <see cref="SolvingPipeline"/>.
+    /// </summary>
     public class Solver
     {
-        private ISolvingStrategy _propagation;
+        private readonly PropagationSolver _propagation;
         private readonly SolvingPipeline _pipeline;
 
-        public Solver(ISolvingStrategy propagation, SolvingPipeline pipeline)
+        /// <summary>
+        /// Initializes a new instance of <see cref="Solver"/> with the given algorithm for finding influenced cells, and <see cref="SolvingPipeline"/> containing implementations of <see cref="ISolvingStrategy"/>.
+        /// </summary>
+        /// <param name="influencedCellsAlgorithm"></param>
+        /// <param name="pipeline"></param>
+        public Solver(IInfluencedCellsAlgorithm influencedCellsAlgorithm, SolvingPipeline pipeline)
         {
-            _propagation = propagation;
+            _propagation = new PropagationSolver(influencedCellsAlgorithm);
             _pipeline = pipeline;
         }
 

@@ -7,10 +7,14 @@ using System.Linq;
 
 namespace DG.Sudoku
 {
+    /// <summary>
+    /// This class represents the board of a sudoku puzzle.
+    /// </summary>
     public class Board
     {
         /// <summary>
-        /// The length of the sides of a sudoku.
+        /// <para>The length of the sides of a sudoku.</para>
+        /// <para>This also defines the amount of rows, columns, and boxes in this sudoku.</para>
         /// </summary>
         public const int SideLength = CellDigit.MaxValue;
 
@@ -123,7 +127,7 @@ namespace DG.Sudoku
         }
 
         /// <summary>
-        /// Returns all cells in the unit specified by <paramref name="unit"/>, with th given zero-based index.
+        /// Returns all cells in the unit specified by <paramref name="unit"/>, with the given zero-based index.
         /// </summary>
         /// <param name="unit"></param>
         /// <param name="index"></param>
@@ -142,26 +146,6 @@ namespace DG.Sudoku
                     return GetCellsInColumn((Column)index, exclude);
                 default:
                     throw new NotImplementedException("Cannot get cells in unit type " + unit + ".");
-            }
-        }
-
-        /// <summary>
-        /// Returns all cells that share a row, column or box with the given cell.
-        /// </summary>
-        /// <param name="cell"></param>
-        /// <returns></returns>
-        public IEnumerable<Cell> GetInfluencedCells(Cell cell)
-        {
-            foreach (var otherCell in _cells)
-            {
-                if (otherCell.Position.X == cell.Position.X && otherCell.Position.Y == cell.Position.Y)
-                {
-                    continue;
-                }
-                if (otherCell.Position.X == cell.Position.X || otherCell.Position.Y == cell.Position.Y || otherCell.Position.Box == cell.Position.Box)
-                {
-                    yield return otherCell;
-                }
             }
         }
 
