@@ -222,6 +222,9 @@ namespace DG.Sudoku
         #endregion
 
         #region samples
+
+        //These properties are for testing purposes.
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public static Board Easy => Parse("---1-5---14----67--8---24---63-7--1-9-------3-1--9-52---72---8--26----35---4-9---");
         public static Board Gentle => Parse("-----4-284-6-----51---3-6-----3-1----87---14----7-9-----2-1---39-----5-767-4-----");
         public static Board Moderate => Parse("72--96--3---2-5----8---4-2--------6-1-65-38-7-4--------3-8---9----7-2---2--43--18");
@@ -236,6 +239,9 @@ namespace DG.Sudoku
         public static Board XWing => Parse("--54--6-2--6-2-15-293561784-523-48--3-12-64-5----5732--3--4256--24--59--5-7--924-");
         public static Board SinglesChain => Parse("--7-836---397-68--82641975364-19-387-8-367----73-48-6-39-87--267649--1382-863-97-");
         public static Board YWing => Parse("645-1-893738459621219638745597-6-184481975---3268415799-2-8--1-8-319----164-2-9-8");
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
         #endregion
     }
 }
