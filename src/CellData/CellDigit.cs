@@ -7,7 +7,7 @@ namespace DG.Sudoku.CellData
     /// <summary>
     /// This class represents the digit possibilities for a <see cref="Cell"/>.
     /// </summary>
-    public sealed class CellDigit : IEquatable<CellDigit>
+    public sealed class CellDigit
     {
         /// <summary>
         /// 9
@@ -15,9 +15,9 @@ namespace DG.Sudoku.CellData
         public const int MaxValue = 9;
 
         // Additional bits track state (lower-case to avoid conflicts)
-        private const short KnownMask = 1 << 0;
-        private const short GivenMask = 1 << 10;
-        private const short GuessMask = 1 << 11;
+        private const short _knownMask = 1 << 0;
+        private const short _givenMask = 1 << 10;
+        private const short _guessMask = 1 << 11;
 
         // Digit Unknown state could be any value
         private const int _unkownMask = 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4 | 1 << 5 | 1 << 6 | 1 << 7 | 1 << 8 | 1 << 9;
@@ -27,22 +27,22 @@ namespace DG.Sudoku.CellData
         /// <summary>
         /// A masked version of <see cref="_bits"/> to only contain bits that indicate the value.
         /// </summary>
-        private short ValueBits => (short)(_bits & ~KnownMask & ~GivenMask & ~GuessMask);
+        private short digitBits => (short)(_bits & ~_knownMask & ~_givenMask & ~_guessMask);
 
         /// <summary>
         /// Indicates if this value is known.
         /// </summary>
-        public bool IsKnown => 0 != (KnownMask & _bits);
+        public bool IsKnown => 0 != (_knownMask & _bits);
 
         /// <summary>
         /// Returns the known value of this cell, otherwise 0.
         /// </summary>
-        public int KnownValue => IsKnown ? Log2n(ValueBits) : 0;
+        public int KnownValue => IsKnown ? Log2n(digitBits) : 0;
 
         /// <summary>
         /// Indicates this cell has no more values it could possibly be.
         /// </summary>
-        public bool IsExhausted => ValueBits == 0;
+        public bool IsExhausted => digitBits == 0;
 
         /// <summary>
         /// Creates a new instance of <see cref="CellDigit"/>.
@@ -79,11 +79,11 @@ namespace DG.Sudoku.CellData
         {
             get
             {
-                if (0 != (GivenMask & _bits))
+                if (0 != (_givenMask & _bits))
                 {
                     return DigitKnowledge.Given;
                 }
-                if (0 != (GuessMask & _bits))
+                if (0 != (_guessMask & _bits))
                 {
                     return DigitKnowledge.Guessed;
                 }
@@ -108,7 +108,7 @@ namespace DG.Sudoku.CellData
         /// <returns></returns>
         public IReadOnlyList<int> GetOptions()
         {
-            return cachedOptions.GetOrAdd(ValueBits, (b) =>
+            return cachedOptions.GetOrAdd(digitBits, (b) =>
             {
                 return GetOptionsWhere(d => true);
             });
@@ -122,7 +122,7 @@ namespace DG.Sudoku.CellData
         public IReadOnlyList<int> GetOptionsWhere(Func<int, bool> digitPredicate)
         {
             List<int> options = new List<int>();
-            for (int i = 1; i <= CellDigit.MaxValue; i++)
+            for (int i = 1; i <= MaxValue; i++)
             {
                 if (!digitPredicate(i))
                 {
@@ -144,7 +144,7 @@ namespace DG.Sudoku.CellData
         public bool HasSingleOption(out int optionFound)
         {
             optionFound = 0;
-            var bitsToCheck = ValueBits;
+            var bitsToCheck = digitBits;
             bool singleOption = bitsToCheck > 0 && (bitsToCheck & bitsToCheck - 1) == 0;
             if (!singleOption)
             {
@@ -166,7 +166,7 @@ namespace DG.Sudoku.CellData
                 return false;
             }
             // Set bits to reflect known value of specified kind
-            _bits = (short)(1 << value | KnownMask | GuessMask);
+            _bits = (short)(1 << value | _knownMask | _guessMask);
             return true;
         }
 
@@ -177,7 +177,7 @@ namespace DG.Sudoku.CellData
         /// <returns></returns>
         public static CellDigit ForKnown(int value)
         {
-            return new CellDigit((short)(1 << value | KnownMask | GivenMask));
+            return new CellDigit((short)(1 << value | _knownMask | _givenMask));
         }
 
         /// <summary>
@@ -192,12 +192,6 @@ namespace DG.Sudoku.CellData
         private static int Log2n(int n)
         {
             return n > 1 ? 1 + Log2n(n / 2) : 0;
-        }
-
-        /// <inheritdoc/>
-        public bool Equals(CellDigit other)
-        {
-            return _bits == other._bits;
         }
 
         /// <summary>
