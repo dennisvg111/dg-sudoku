@@ -41,7 +41,7 @@ namespace DG.Sudoku
             return false;
         }
 
-        public static SolvingPipeline WithStartingStrategy(ISolvingStrategy strategy)
+        public static SolvingPipeline With(ISolvingStrategy strategy)
         {
             var pipeline = new SolvingPipeline();
             pipeline._strategies.Add(strategy);
