@@ -3,6 +3,9 @@ using System;
 
 namespace DG.Sudoku
 {
+    /// <summary>
+    /// This class represents the zero-indexed position of a cell.
+    /// </summary>
     public sealed class Position
     {
         private readonly int _x;

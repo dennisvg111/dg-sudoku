@@ -1,4 +1,5 @@
-﻿using DG.Sudoku.CellData;
+﻿using DG.Common.Exceptions;
+using DG.Sudoku.CellData;
 using DG.Sudoku.Units;
 using System;
 using System.Collections.Generic;
@@ -8,28 +9,66 @@ namespace DG.Sudoku
 {
     public class Board
     {
+        /// <summary>
+        /// The length of the sides of a sudoku.
+        /// </summary>
         public const int SideLength = CellDigit.MaxValue;
-        public static readonly int RegionSize = (int)Math.Sqrt(SideLength);
+
+        /// <summary>
+        /// The length of the sides of a box inside a sudoku.
+        /// </summary>
+        public static readonly int BoxSize = (int)Math.Sqrt(SideLength);
+
         private const int BoardSize = SideLength * SideLength;
 
         private readonly Cell[] _cells;
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Board"/> where all cells are unknown.
+        /// </summary>
         public Board() : this(Enumerable.Range(0, BoardSize).Select(i => Cell.ForUnkown(i % SideLength, (int)Math.Floor(i / (double)SideLength))).ToArray()) { }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Board"/> with the given cells.
+        /// </summary>
+        /// <param name="cells"></param>
         private Board(Cell[] cells)
         {
+            ThrowIf.Collection(cells, nameof(cells)).IsEmpty();
+            ThrowIf.Collection(cells, nameof(cells)).CountOtherThan(BoardSize);
             _cells = cells;
         }
 
-        internal Board Copy()
+        /// <summary>
+        /// Creates a copy of this board.
+        /// </summary>
+        /// <returns></returns>
+        public Board Copy()
         {
             return new Board(_cells.Select(c => c.Copy()).ToArray());
         }
 
+        /// <summary>
+        /// Returns the cell at the given zero-indexed x and y coordinate.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public Cell this[int x, int y] => _cells[y * SideLength + x];
 
+        /// <summary>
+        /// Returns the cell at the given position.
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
         public Cell this[Position i] => this[i.X, i.Y];
 
+        /// <summary>
+        /// Returns all cells in the given column.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="exclude"></param>
+        /// <returns></returns>
         public IEnumerable<Cell> GetCellsInColumn(Column x, params Cell[] exclude)
         {
             for (int y = 0; y < SideLength; y++)
@@ -42,6 +81,12 @@ namespace DG.Sudoku
             }
         }
 
+        /// <summary>
+        /// Returns all cells in the given row.
+        /// </summary>
+        /// <param name="y"></param>
+        /// <param name="exclude"></param>
+        /// <returns></returns>
         public IEnumerable<Cell> GetCellsInRow(Row y, params Cell[] exclude)
         {
             for (int x = 0; x < SideLength; x++)
@@ -54,13 +99,19 @@ namespace DG.Sudoku
             }
         }
 
+        /// <summary>
+        /// Returns all cells in the given box.
+        /// </summary>
+        /// <param name="region"></param>
+        /// <param name="exclude"></param>
+        /// <returns></returns>
         public IEnumerable<Cell> GetCellsInBox(Box region, params Cell[] exclude)
         {
-            int offsetX = ((int)region % RegionSize) * RegionSize;
-            int offsetY = ((int)region / RegionSize) * RegionSize;
-            for (int y = offsetY; y < offsetY + RegionSize; y++)
+            int offsetX = ((int)region % BoxSize) * BoxSize;
+            int offsetY = ((int)region / BoxSize) * BoxSize;
+            for (int y = offsetY; y < offsetY + BoxSize; y++)
             {
-                for (int x = offsetX; x < offsetX + RegionSize; x++)
+                for (int x = offsetX; x < offsetX + BoxSize; x++)
                 {
                     if (exclude.Any(c => c.Position.Y == y && c.Position.X == x))
                     {
@@ -71,6 +122,14 @@ namespace DG.Sudoku
             }
         }
 
+        /// <summary>
+        /// Returns all cells in the unit specified by <paramref name="unit"/>, with th given zero-based index.
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <param name="index"></param>
+        /// <param name="exclude"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public IEnumerable<Cell> GetCellsInUnit(UnitType unit, int index, params Cell[] exclude)
         {
             switch (unit)
@@ -86,6 +145,11 @@ namespace DG.Sudoku
             }
         }
 
+        /// <summary>
+        /// Returns all cells that share a row, column or box with the given cell.
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <returns></returns>
         public IEnumerable<Cell> GetInfluencedCells(Cell cell)
         {
             foreach (var otherCell in _cells)
@@ -102,6 +166,12 @@ namespace DG.Sudoku
         }
 
         #region serialization
+        /// <summary>
+        /// Tries to parse the given string <paramref name="s"/> to a board, where each character in the string represents a cell and characters <c>'1'</c> through <c>'9'</c> get parsed as given digits.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="board"></param>
+        /// <returns></returns>
         public static bool TryParse(string s, out Board board)
         {
             if (string.IsNullOrEmpty(s) || s.Length != BoardSize)
@@ -123,7 +193,13 @@ namespace DG.Sudoku
             return true;
         }
 
-        internal static Board Parse(string s)
+        /// <summary>
+        /// Parses the given string <paramref name="s"/> to a board, where each character in the string represents a cell and characters <c>'1'</c> through <c>'9'</c> get parsed as given digits.
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        /// <exception cref="FormatException"></exception>
+        public static Board Parse(string s)
         {
             Board board;
             if (TryParse(s, out board))
@@ -133,9 +209,15 @@ namespace DG.Sudoku
             throw new FormatException($"String {s} is not a valid {nameof(Board)} format.");
         }
 
+        /// <summary>
+        /// <para>Renders this board as a string where each cell will be rendered as a single character (left to right, top to bottom).</para>
+        /// <para>Unknown digits will be rendered as <c>'-'</c>.</para>
+        /// <para>Note that this string can be parsed back using <see cref="TryParse(string, out Board)"/> or <see cref="Parse(string)"/>.</para>
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
-            return string.Concat(_cells.Select(c => c.Digit.IsKnown ? c.Digit.KnownValue.ToString() : "."));
+            return string.Concat(_cells.Select(c => c.Digit.IsKnown ? c.Digit.KnownValue.ToString() : "-"));
         }
         #endregion
 
