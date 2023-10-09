@@ -1,6 +1,7 @@
-﻿using Xunit;
+﻿using DG.Sudoku.CellData;
+using Xunit;
 
-namespace DG.Sudoku.Tests
+namespace DG.Sudoku.Tests.CellData
 {
     public class CellDigitTests
     {
@@ -23,6 +24,7 @@ namespace DG.Sudoku.Tests
 
             Assert.False(value.CouldBe(3));
             Assert.False(value.CouldBe(9));
+            Assert.True(value.CouldBe(7));
         }
 
         [Fact]
@@ -30,9 +32,9 @@ namespace DG.Sudoku.Tests
         {
             var value = CellDigit.ForUnknown();
 
-            value.Exclude(1);
-            value.Exclude(4);
-            value.Exclude(9);
+            value.RemoveCandidate(1);
+            value.RemoveCandidate(4);
+            value.RemoveCandidate(9);
 
             Assert.False(value.CouldBe(4));
             Assert.False(value.CouldBe(9));
@@ -41,16 +43,16 @@ namespace DG.Sudoku.Tests
             Assert.True(value.CouldBe(3));
             Assert.True(value.CouldBe(7));
 
-            Assert.False(value.HasSingleOption(out int _));
+            Assert.False(value.HasSingleCandidate(out int _));
 
-            value.Exclude(2);
-            value.Exclude(3);
-            value.Exclude(5);
-            value.Exclude(6);
-            value.Exclude(7);
+            value.RemoveCandidate(2);
+            value.RemoveCandidate(3);
+            value.RemoveCandidate(5);
+            value.RemoveCandidate(6);
+            value.RemoveCandidate(7);
 
             Assert.False(value.IsKnown);
-            Assert.True(value.HasSingleOption(out int _));
+            Assert.True(value.HasSingleCandidate(out int _));
         }
 
         [Fact]
@@ -58,10 +60,10 @@ namespace DG.Sudoku.Tests
         {
             var value = CellDigit.ForUnknown();
 
-            value.Exclude(1);
-            value.Exclude(4);
-            value.Exclude(9);
-            value.TrySetValue(5);
+            value.RemoveCandidate(1);
+            value.RemoveCandidate(4);
+            value.RemoveCandidate(9);
+            value.TryGuessValue(5);
 
             Assert.Equal(DigitKnowledge.Guessed, value.Type);
         }

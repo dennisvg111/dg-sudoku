@@ -1,27 +1,53 @@
-﻿using DG.Sudoku.SolvingStrategies;
+﻿using DG.Sudoku.Propagation;
+using DG.Sudoku.SolvingStrategies;
 using System.Collections.Generic;
 
 namespace DG.Sudoku
 {
+    /// <summary>
+    /// Solves sudoku puzzles by propagating solved cells, and stepping through a <see cref="SolvingPipeline"/>.
+    /// </summary>
     public class Solver
     {
-        private ISolvingStrategy _propagation;
+        private readonly PropagationSolver _propagation;
         private readonly SolvingPipeline _pipeline;
 
-        public Solver(ISolvingStrategy propagation, SolvingPipeline pipeline)
+        /// <summary>
+        /// Initializes a new instance of <see cref="Solver"/> with the given algorithm for finding influenced cells, and <see cref="SolvingPipeline"/> containing implementations of <see cref="ISolvingStrategy"/>.
+        /// </summary>
+        /// <param name="influencedCellsAlgorithm"></param>
+        /// <param name="pipeline"></param>
+        public Solver(IInfluencedCellsAlgorithm influencedCellsAlgorithm, SolvingPipeline pipeline)
         {
-            _propagation = propagation;
+            _propagation = new PropagationSolver(influencedCellsAlgorithm);
             _pipeline = pipeline;
         }
 
-        public void NextSteps(Board board, int steps)
+        /// <summary>
+        /// Executes the <see cref="NextStep(Board)"/> method <paramref name="n"/> amount of times.
+        /// </summary>
+        /// <param name="board"></param>
+        /// <param name="n"></param>
+        public void NextSteps(Board board, int n)
         {
-            for (int i = 0; i < steps; i++)
+            for (int i = 0; i < n; i++)
             {
                 NextStep(board);
             }
         }
 
+        /// <summary>
+        /// <para>Tries to remove candidates from cells on the given board, and returns a value indicating if this was successful.</para>
+        /// <para>This always happens 1 step at a time. A step can be any of the following:
+        /// <list type="number">
+        /// <item>Finding one or multiple cells have been solved (only 1 possible candidate).</item>
+        /// <item>Eliminating candidates by propagating solved cells using an instance of <see cref="PropagationSolver"/>.</item>
+        /// <item>Eliminating candidates using a strategy in the <see cref="SolvingPipeline"/>.</item>
+        /// </list>
+        /// </para>
+        /// </summary>
+        /// <param name="board"></param>
+        /// <returns></returns>
         public bool NextStep(Board board)
         {
             int found = CheckForSolved(board);
@@ -30,28 +56,28 @@ namespace DG.Sudoku
                 return true;
             }
 
-            if (_propagation.TryFindValuesToRemove(board, out IEnumerable<ValueInCell> valuesToRemove))
+            if (_propagation.TryFindCandidatesToRemove(board, out IEnumerable<Candidate> candidatesToRemove))
             {
-                RemoveOptions(board, valuesToRemove);
+                RemoveCandidates(board, candidatesToRemove);
                 return true;
             }
 
             string strategy;
-            if (_pipeline.TryPipeline(board, out strategy, out valuesToRemove))
+            if (_pipeline.TryPipeline(board, out strategy, out candidatesToRemove))
             {
-                RemoveOptions(board, valuesToRemove);
+                RemoveCandidates(board, candidatesToRemove);
                 return true;
             }
 
             return false;
         }
 
-        private void RemoveOptions(Board board, IEnumerable<ValueInCell> valuesToRemove)
+        private void RemoveCandidates(Board board, IEnumerable<Candidate> candidates)
         {
 
-            foreach (var value in valuesToRemove)
+            foreach (var value in candidates)
             {
-                board[value.Position].Digit.Exclude(value.Value);
+                board[value.Position].Digit.RemoveCandidate(value.Digit);
             }
         }
 
@@ -73,9 +99,9 @@ namespace DG.Sudoku
                         continue;
                     }
                     int option;
-                    if (cell.Digit.HasSingleOption(out option))
+                    if (cell.Digit.HasSingleCandidate(out option))
                     {
-                        cell.Digit.TrySetValue(option);
+                        cell.Digit.TryGuessValue(option);
                         found++;
                     }
                 }

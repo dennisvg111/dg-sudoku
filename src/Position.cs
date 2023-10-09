@@ -3,6 +3,9 @@ using System;
 
 namespace DG.Sudoku
 {
+    /// <summary>
+    /// This class represents the zero-indexed position of a cell.
+    /// </summary>
     public sealed class Position
     {
         private readonly int _x;
@@ -47,7 +50,13 @@ namespace DG.Sudoku
             return new Position(x, y);
         }
 
-        internal int GetIndex(UnitType unit)
+        /// <summary>
+        /// Returns the zero-based index of this position in the given type of unit.
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public int GetIndex(UnitType unit)
         {
             switch (unit)
             {
