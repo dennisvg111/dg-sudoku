@@ -26,18 +26,18 @@ namespace DG.Sudoku
             return new SolvingPipeline(_strategies);
         }
 
-        public bool TryPipeline(Board board, out string usedStrategy, out IEnumerable<PossibleDigitInCell> valuesToRemove)
+        public bool TryPipeline(Board board, out string usedStrategy, out IEnumerable<Candidate> valuesToRemove)
         {
             usedStrategy = string.Empty;
             foreach (var strategy in _strategies)
             {
                 usedStrategy = strategy.Name;
-                if (strategy.TryFindValuesToRemove(board, out valuesToRemove))
+                if (strategy.TryFindCandidatesToRemove(board, out valuesToRemove))
                 {
                     return true;
                 }
             }
-            valuesToRemove = Enumerable.Empty<PossibleDigitInCell>();
+            valuesToRemove = Enumerable.Empty<Candidate>();
             return false;
         }
 

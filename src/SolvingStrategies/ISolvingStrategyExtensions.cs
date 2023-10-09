@@ -9,23 +9,23 @@ namespace DG.Sudoku.SolvingStrategies
     public static class ISolvingStrategyExtensions
     {
         /// <summary>
-        /// Executes the <see cref="ISolvingStrategy.FindValuesToRemove(Board)"/> method and returns a value indicating if any digits have been found that haven't already been removed.
+        /// Executes the <see cref="ISolvingStrategy.FindCandidatesToRemove(Board)"/> method and returns a value indicating if any candidates have been found that haven't already been removed.
         /// </summary>
         /// <param name="strategy"></param>
         /// <param name="board"></param>
-        /// <param name="valuesToRemove"></param>
+        /// <param name="candidatesToRemove"></param>
         /// <returns></returns>
-        public static bool TryFindValuesToRemove(this ISolvingStrategy strategy, Board board, out IEnumerable<PossibleDigitInCell> valuesToRemove)
+        public static bool TryFindCandidatesToRemove(this ISolvingStrategy strategy, Board board, out IEnumerable<Candidate> candidatesToRemove)
         {
             var copy = board.Copy();
-            var removables = strategy.FindValuesToRemove(copy);
-            removables = removables.Where(vc => board[vc.Position].Digit.CouldBe(vc.Digit)).ToArray();
-            if (!removables.Any())
+            var candidates = strategy.FindCandidatesToRemove(copy);
+            candidates = candidates.Where(c => board[c.Position].Digit.CouldBe(c.Digit)).ToArray();
+            if (!candidates.Any())
             {
-                valuesToRemove = Enumerable.Empty<PossibleDigitInCell>();
+                candidatesToRemove = Enumerable.Empty<Candidate>();
                 return false;
             }
-            valuesToRemove = removables;
+            candidatesToRemove = candidates;
             return true;
         }
     }

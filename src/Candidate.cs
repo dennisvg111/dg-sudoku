@@ -3,7 +3,7 @@
     /// <summary>
     /// This class represents a digit from 1 through 9 that could be located in a cell in a given <see cref="Position"/>.
     /// </summary>
-    public class PossibleDigitInCell
+    public class Candidate
     {
         private readonly Position _position;
         private readonly int _digit;
@@ -19,37 +19,48 @@
         public int Digit => _digit;
 
         /// <summary>
-        /// Creates a new instance of <see cref="PossibleDigitInCell"/> with the given position and digit.
+        /// Creates a new instance of <see cref="Candidate"/> with the given position and digit.
         /// </summary>
         /// <param name="position"></param>
         /// <param name="digit"></param>
-        public PossibleDigitInCell(Position position, int digit)
+        public Candidate(Position position, int digit)
         {
             _position = position;
             _digit = digit;
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="PossibleDigitInCell"/> with the given position and digit.
+        /// Creates a new instance of <see cref="Candidate"/> with the cell and digit.
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <param name="digit"></param>
+        /// <returns></returns>
+        public static Candidate For(Cell cell, int digit)
+        {
+            return new Candidate(cell.Position, digit);
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="Candidate"/> with the given position and digit.
         /// </summary>
         /// <param name="position"></param>
         /// <param name="digit"></param>
         /// <returns></returns>
-        public static PossibleDigitInCell For(Position position, int digit)
+        public static Candidate For(Position position, int digit)
         {
-            return new PossibleDigitInCell(position, digit);
+            return new Candidate(position, digit);
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="PossibleDigitInCell"/> with the given x and y index as position, and the given digit.
+        /// Creates a new instance of <see cref="Candidate"/> with the given x and y index as position, and the given digit.
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="digit"></param>
         /// <returns></returns>
-        public static PossibleDigitInCell For(int x, int y, int digit)
+        public static Candidate For(int x, int y, int digit)
         {
-            return new PossibleDigitInCell(Position.For(x, y), digit);
+            return new Candidate(Position.For(x, y), digit);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace DG.Sudoku
                 return true;
             }
 
-            if (_propagation.TryFindValuesToRemove(board, out IEnumerable<PossibleDigitInCell> valuesToRemove))
+            if (_propagation.TryFindCandidatesToRemove(board, out IEnumerable<Candidate> valuesToRemove))
             {
                 RemoveOptions(board, valuesToRemove);
                 return true;
@@ -46,12 +46,12 @@ namespace DG.Sudoku
             return false;
         }
 
-        private void RemoveOptions(Board board, IEnumerable<PossibleDigitInCell> valuesToRemove)
+        private void RemoveOptions(Board board, IEnumerable<Candidate> valuesToRemove)
         {
 
             foreach (var value in valuesToRemove)
             {
-                board[value.Position].Digit.RemoveOption(value.Digit);
+                board[value.Position].Digit.RemoveCandidate(value.Digit);
             }
         }
 
@@ -73,7 +73,7 @@ namespace DG.Sudoku
                         continue;
                     }
                     int option;
-                    if (cell.Digit.HasSingleOption(out option))
+                    if (cell.Digit.HasSingleCandidate(out option))
                     {
                         cell.Digit.TryGuessValue(option);
                         found++;

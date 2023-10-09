@@ -3,7 +3,7 @@
 namespace DG.Sudoku.SolvingStrategies
 {
     /// <summary>
-    /// Defines a strategy used to remove possible digits from cells in a sudoku board.
+    /// Defines a strategy used to remove candidates from cells in a sudoku board.
     /// </summary>
     public interface ISolvingStrategy
     {
@@ -18,10 +18,10 @@ namespace DG.Sudoku.SolvingStrategies
         Difficulty Difficulty { get; }
 
         /// <summary>
-        /// Finds the values to remove from the board. 
+        /// Finds the candidates to remove from the board. 
         /// </summary>
         /// <param name="board"></param>
         /// <returns></returns>
-        IEnumerable<PossibleDigitInCell> FindValuesToRemove(Board board);
+        IEnumerable<Candidate> FindCandidatesToRemove(Board board);
     }
 }

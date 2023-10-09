@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace DG.Sudoku.Exceptions
 {
     /// <summary>
-    /// Represents errors that occur due to cells that have no more possible digits.
+    /// Represents errors that occur due to cells that have no more possible candidates.
     /// </summary>
     [Serializable]
     public class ExhaustedCellException : Exception

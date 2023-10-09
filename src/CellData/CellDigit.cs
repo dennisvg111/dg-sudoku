@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace DG.Sudoku.CellData
 {
     /// <summary>
-    /// This class represents the digit possibilities for a <see cref="Cell"/>.
+    /// This class represents the possible candidates for a <see cref="Cell"/>.
     /// </summary>
     public sealed class CellDigit
     {
@@ -63,13 +63,13 @@ namespace DG.Sudoku.CellData
         }
 
         /// <summary>
-        /// Excludes the given <paramref name="digit"/> from the possible digits this cell can be.
+        /// Excludes the given <paramref name="candidate"/> from the possible digits this cell can be.
         /// </summary>
-        /// <param name="digit"></param>
-        public void RemoveOption(int digit)
+        /// <param name="candidate"></param>
+        public void RemoveCandidate(int candidate)
         {
             // Mask-out the excluded value
-            _bits &= (short)~(1 << digit);
+            _bits &= (short)~(1 << candidate);
         }
 
         /// <summary>
@@ -92,13 +92,13 @@ namespace DG.Sudoku.CellData
         }
 
         /// <summary>
-        /// Indicates if this digit could be equal to the given value.
+        /// Indicates if this digit could be equal to the given <paramref name="candidate"/>.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="candidate"></param>
         /// <returns></returns>
-        public bool CouldBe(int value)
+        public bool CouldBe(int candidate)
         {
-            return (_bits & 1 << value) != 0;
+            return (_bits & 1 << candidate) != 0;
         }
 
         private static readonly ConcurrentDictionary<short, IReadOnlyList<int>> cachedOptions = new ConcurrentDictionary<short, IReadOnlyList<int>>();
@@ -106,11 +106,11 @@ namespace DG.Sudoku.CellData
         /// Returns a list of the digits 1 through 9 that can be represented by the given mask <see cref="short"/>.
         /// </summary>
         /// <returns></returns>
-        public IReadOnlyList<int> GetOptions()
+        public IReadOnlyList<int> GetCandidates()
         {
             return cachedOptions.GetOrAdd(digitBits, (b) =>
             {
-                return GetOptionsWhere(d => true);
+                return GetCandidatesWhere(d => true);
             });
         }
 
@@ -119,7 +119,7 @@ namespace DG.Sudoku.CellData
         /// </summary>
         /// <param name="digitPredicate"></param>
         /// <returns></returns>
-        public IReadOnlyList<int> GetOptionsWhere(Func<int, bool> digitPredicate)
+        public IReadOnlyList<int> GetCandidatesWhere(Func<int, bool> digitPredicate)
         {
             List<int> options = new List<int>();
             for (int i = 1; i <= MaxValue; i++)
@@ -137,20 +137,20 @@ namespace DG.Sudoku.CellData
         }
 
         /// <summary>
-        /// Indicates if this digit has only one possible value, and returns the possible value as <paramref name="optionFound"/>.
+        /// Indicates if this digit has only one possible value, and returns the possible value as <paramref name="candidate"/>.
         /// </summary>
-        /// <param name="optionFound"></param>
+        /// <param name="candidate"></param>
         /// <returns></returns>
-        public bool HasSingleOption(out int optionFound)
+        public bool HasSingleCandidate(out int candidate)
         {
-            optionFound = 0;
+            candidate = 0;
             var bitsToCheck = digitBits;
             bool singleOption = bitsToCheck > 0 && (bitsToCheck & bitsToCheck - 1) == 0;
             if (!singleOption)
             {
                 return false;
             }
-            optionFound = Log2n(bitsToCheck);
+            candidate = Log2n(bitsToCheck);
             return true;
         }
 
