@@ -2,12 +2,22 @@
 
 namespace DG.Sudoku
 {
+    /// <summary>
+    /// Represents a cell in a sudoku board.
+    /// </summary>
     public class Cell
     {
         private readonly Position _position;
         private readonly CellDigit _digit;
 
+        /// <summary>
+        /// The position of this cell.
+        /// </summary>
         public Position Position => _position;
+
+        /// <summary>
+        /// The digit or possible candidates of this cell.
+        /// </summary>
         public CellDigit Digit => _digit;
 
 
@@ -17,17 +27,34 @@ namespace DG.Sudoku
             _digit = digit;
         }
 
+        /// <summary>
+        /// Creates a copy of this cell.
+        /// </summary>
+        /// <returns></returns>
         public Cell Copy()
         {
             //position is read-only so we don't need to copy it.
             return new Cell(_position, _digit.Copy());
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Cell"/>, with the given position and digit, and with <see cref="DigitKnowledge.Given"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="digit"></param>
+        /// <returns></returns>
         public static Cell ForKnown(int x, int y, int digit)
         {
             return new Cell(Position.For(x, y), CellDigit.ForKnown(digit));
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Cell"/> with all candidates possible and with <see cref="DigitKnowledge.Unknown"/>
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static Cell ForUnkown(int x, int y)
         {
             return new Cell(Position.For(x, y), CellDigit.ForUnknown());
