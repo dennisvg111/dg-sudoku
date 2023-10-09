@@ -50,7 +50,13 @@ namespace DG.Sudoku
             return new Position(x, y);
         }
 
-        internal int GetIndex(UnitType unit)
+        /// <summary>
+        /// Returns the zero-based index of this position in the given type of unit.
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public int GetIndex(UnitType unit)
         {
             switch (unit)
             {
