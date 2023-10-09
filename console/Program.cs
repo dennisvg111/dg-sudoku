@@ -28,7 +28,7 @@ namespace DG.Sudoku.Console
                 DrawDetailedBoard(board);
                 Thread.Sleep(500);
             } while (solver.NextStep(board));
-            Output.WriteLine("Could not find more solving steps"); ;
+            Output.WriteLine("Could not find more solving steps");
         }
 
         private static void DrawDetailedBoard(Board board)
