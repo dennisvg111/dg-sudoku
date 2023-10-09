@@ -51,7 +51,7 @@ namespace DG.Sudoku
 
             foreach (var value in valuesToRemove)
             {
-                board[value.Position].Digit.Exclude(value.Digit);
+                board[value.Position].Digit.RemoveOption(value.Digit);
             }
         }
 
@@ -75,7 +75,7 @@ namespace DG.Sudoku
                     int option;
                     if (cell.Digit.HasSingleOption(out option))
                     {
-                        cell.Digit.TrySetValue(option);
+                        cell.Digit.TryGuessValue(option);
                         found++;
                     }
                 }

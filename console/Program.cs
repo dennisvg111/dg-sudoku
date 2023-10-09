@@ -6,7 +6,7 @@ using Output = System.Console;
 
 namespace DG.Sudoku.Console
 {
-    internal class Program
+    internal static class Program
     {
         private static readonly ConsoleColor defaultColor = ConsoleColor.DarkGray;
 
@@ -21,7 +21,8 @@ namespace DG.Sudoku.Console
                 Output.WriteLine("\"" + input + "\"");
             }
 
-            Solver solver = new Solver(new PropagationSolver(), new SolvingPipeline());
+            var pipeline = new SolvingPipeline();
+            Solver solver = new Solver(new PropagationSolver(), pipeline);
 
             do
             {

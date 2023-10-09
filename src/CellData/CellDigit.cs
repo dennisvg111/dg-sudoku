@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace DG.Sudoku.CellData
 {
@@ -14,8 +16,8 @@ namespace DG.Sudoku.CellData
 
         // Additional bits track state (lower-case to avoid conflicts)
         private const short KnownMask = 1 << 0;
-        internal const short GivenMask = 1 << 10;
-        internal const short GuessMask = 1 << 11;
+        private const short GivenMask = 1 << 10;
+        private const short GuessMask = 1 << 11;
 
         // Digit Unknown state could be any value
         private const int _unkownMask = 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4 | 1 << 5 | 1 << 6 | 1 << 7 | 1 << 8 | 1 << 9;
@@ -25,7 +27,7 @@ namespace DG.Sudoku.CellData
         /// <summary>
         /// A masked version of <see cref="_bits"/> to only contain bits that indicate the value.
         /// </summary>
-        internal short ValueBits => (short)(_bits & ~KnownMask & ~GivenMask & ~GuessMask);
+        private short ValueBits => (short)(_bits & ~KnownMask & ~GivenMask & ~GuessMask);
 
         /// <summary>
         /// Indicates if this value is known.
@@ -46,7 +48,7 @@ namespace DG.Sudoku.CellData
         /// Creates a new instance of <see cref="CellDigit"/>.
         /// </summary>
         /// <param name="bits"></param>
-        internal CellDigit(short bits)
+        private CellDigit(short bits)
         {
             _bits = bits;
         }
@@ -64,7 +66,7 @@ namespace DG.Sudoku.CellData
         /// Excludes the given <paramref name="digit"/> from the possible digits this cell can be.
         /// </summary>
         /// <param name="digit"></param>
-        public void Exclude(int digit)
+        public void RemoveOption(int digit)
         {
             // Mask-out the excluded value
             _bits &= (short)~(1 << digit);
@@ -96,7 +98,42 @@ namespace DG.Sudoku.CellData
         /// <returns></returns>
         public bool CouldBe(int value)
         {
-            return _bits.CanBeDigit(value);
+            return (_bits & 1 << value) != 0;
+        }
+
+        private static readonly ConcurrentDictionary<short, IReadOnlyList<int>> cachedOptions = new ConcurrentDictionary<short, IReadOnlyList<int>>();
+        /// <summary>
+        /// Returns a list of the digits 1 through 9 that can be represented by the given mask <see cref="short"/>.
+        /// </summary>
+        /// <returns></returns>
+        public IReadOnlyList<int> GetOptions()
+        {
+            return cachedOptions.GetOrAdd(ValueBits, (b) =>
+            {
+                return GetOptionsWhere(d => true);
+            });
+        }
+
+        /// <summary>
+        /// Returns a list of possible values this digit can have, checking only the values that match the given <paramref name="digitPredicate"/>.
+        /// </summary>
+        /// <param name="digitPredicate"></param>
+        /// <returns></returns>
+        public IReadOnlyList<int> GetOptionsWhere(Func<int, bool> digitPredicate)
+        {
+            List<int> options = new List<int>();
+            for (int i = 1; i <= CellDigit.MaxValue; i++)
+            {
+                if (!digitPredicate(i))
+                {
+                    continue;
+                }
+                if (CouldBe(i))
+                {
+                    options.Add(i);
+                }
+            }
+            return options;
         }
 
         /// <summary>
@@ -118,11 +155,11 @@ namespace DG.Sudoku.CellData
         }
 
         /// <summary>
-        /// Tries to set this digit to the given value.
+        /// Sets this digit to the given value (if <see cref="IsKnown"/> is currently false), and changes <see cref="Type"/> to <see cref="DigitKnowledge.Guessed"/>.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public bool TrySetValue(int value)
+        public bool TryGuessValue(int value)
         {
             if (IsKnown && value != KnownValue)
             {

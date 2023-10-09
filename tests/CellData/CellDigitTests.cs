@@ -31,9 +31,9 @@ namespace DG.Sudoku.Tests.CellData
         {
             var value = CellDigit.ForUnknown();
 
-            value.Exclude(1);
-            value.Exclude(4);
-            value.Exclude(9);
+            value.RemoveOption(1);
+            value.RemoveOption(4);
+            value.RemoveOption(9);
 
             Assert.False(value.CouldBe(4));
             Assert.False(value.CouldBe(9));
@@ -44,11 +44,11 @@ namespace DG.Sudoku.Tests.CellData
 
             Assert.False(value.HasSingleOption(out int _));
 
-            value.Exclude(2);
-            value.Exclude(3);
-            value.Exclude(5);
-            value.Exclude(6);
-            value.Exclude(7);
+            value.RemoveOption(2);
+            value.RemoveOption(3);
+            value.RemoveOption(5);
+            value.RemoveOption(6);
+            value.RemoveOption(7);
 
             Assert.False(value.IsKnown);
             Assert.True(value.HasSingleOption(out int _));
@@ -59,10 +59,10 @@ namespace DG.Sudoku.Tests.CellData
         {
             var value = CellDigit.ForUnknown();
 
-            value.Exclude(1);
-            value.Exclude(4);
-            value.Exclude(9);
-            value.TrySetValue(5);
+            value.RemoveOption(1);
+            value.RemoveOption(4);
+            value.RemoveOption(9);
+            value.TryGuessValue(5);
 
             Assert.Equal(DigitKnowledge.Guessed, value.Type);
         }
