@@ -1,5 +1,6 @@
 ﻿using DG.Sudoku.CellData;
 using DG.Sudoku.Propagation;
+using DG.Sudoku.SolvingStrategies;
 using System;
 using System.Threading;
 using Output = System.Console;
@@ -21,7 +22,8 @@ namespace DG.Sudoku.Console
                 Output.WriteLine("\"" + input + "\"");
             }
 
-            var pipeline = new SolvingPipeline();
+            var pipeline = SolvingPipeline
+                .With(new HiddenSingleStrategy());
             Solver solver = new Solver(LoopingInfluencedCellsAlgorithm.Instance, pipeline);
 
             do
