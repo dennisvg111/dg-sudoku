@@ -28,7 +28,7 @@ namespace DG.Sudoku.Tests.CellData
         }
 
         [Fact]
-        public void Exclude_Works()
+        public void RemoveCandidate_Works()
         {
             var value = CellDigit.ForUnknown();
 
@@ -56,7 +56,7 @@ namespace DG.Sudoku.Tests.CellData
         }
 
         [Fact]
-        public void TrySetValue_MakesTypeGuess()
+        public void TryGuessValue_MakesTypeGuess()
         {
             var value = CellDigit.ForUnknown();
 
@@ -66,6 +66,25 @@ namespace DG.Sudoku.Tests.CellData
             value.TryGuessValue(5);
 
             Assert.Equal(DigitKnowledge.Guessed, value.Type);
+        }
+
+        [Fact]
+        public void WithCandidates_Works()
+        {
+            var value = CellDigit.WithCandidates(1, 5, 9);
+
+            for (int i = 2; i < 5; i++)
+            {
+                Assert.False(value.CouldBe(i));
+            }
+            for (int i = 6; i < 9; i++)
+            {
+                Assert.False(value.CouldBe(i));
+            }
+
+            Assert.True(value.CouldBe(1));
+            Assert.True(value.CouldBe(5));
+            Assert.True(value.CouldBe(9));
         }
     }
 }

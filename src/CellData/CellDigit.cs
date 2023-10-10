@@ -189,6 +189,24 @@ namespace DG.Sudoku.CellData
             return new CellDigit(_unkownMask);
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="CellDigit"/> where the underlying digit is not known, but can only be one of the given candidates.
+        /// </summary>
+        /// <param name="candidates"></param>
+        /// <returns></returns>
+        public static CellDigit WithCandidates(params int[] candidates)
+        {
+            short bits = 0;
+            if (candidates != null)
+            {
+                foreach (var candidate in candidates)
+                {
+                    bits |= (short)(1 << candidate);
+                }
+            }
+            return new CellDigit(bits);
+        }
+
         private static int Log2n(int n)
         {
             return n > 1 ? 1 + Log2n(n / 2) : 0;
