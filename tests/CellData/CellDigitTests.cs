@@ -18,7 +18,7 @@ namespace DG.Sudoku.Tests.CellData
         }
 
         [Fact]
-        public void ForKnown_CouldBeAnything()
+        public void ForKnown_CanOnlyBeValue()
         {
             var value = CellDigit.ForKnown(7);
 
@@ -28,13 +28,12 @@ namespace DG.Sudoku.Tests.CellData
         }
 
         [Fact]
-        public void RemoveCandidate_Works()
+        public void WithoutCandidate_Works()
         {
-            var value = CellDigit.ForUnknown();
-
-            value.RemoveCandidate(1);
-            value.RemoveCandidate(4);
-            value.RemoveCandidate(9);
+            var value = CellDigit.ForUnknown()
+                .WithoutCandidate(1)
+                .WithoutCandidate(4)
+                .WithoutCandidate(9);
 
             Assert.False(value.CouldBe(4));
             Assert.False(value.CouldBe(9));
@@ -45,27 +44,14 @@ namespace DG.Sudoku.Tests.CellData
 
             Assert.False(value.HasSingleCandidate(out int _));
 
-            value.RemoveCandidate(2);
-            value.RemoveCandidate(3);
-            value.RemoveCandidate(5);
-            value.RemoveCandidate(6);
-            value.RemoveCandidate(7);
+            value = value.WithoutCandidate(2)
+            .WithoutCandidate(3)
+            .WithoutCandidate(5)
+            .WithoutCandidate(6)
+            .WithoutCandidate(7);
 
             Assert.False(value.IsKnown);
             Assert.True(value.HasSingleCandidate(out int _));
-        }
-
-        [Fact]
-        public void TryGuessValue_MakesTypeGuess()
-        {
-            var value = CellDigit.ForUnknown();
-
-            value.RemoveCandidate(1);
-            value.RemoveCandidate(4);
-            value.RemoveCandidate(9);
-            value.TryGuessValue(5);
-
-            Assert.Equal(DigitKnowledge.Guessed, value.Type);
         }
 
         [Fact]

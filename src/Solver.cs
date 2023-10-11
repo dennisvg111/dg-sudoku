@@ -77,7 +77,7 @@ namespace DG.Sudoku
 
             foreach (var value in candidates)
             {
-                board[value.Position].Digit.RemoveCandidate(value.Digit);
+                board.RemoveCandidate(value);
             }
         }
 
@@ -93,15 +93,8 @@ namespace DG.Sudoku
             {
                 for (int y = 0; y < Board.SideLength; y++)
                 {
-                    var cell = board[x, y];
-                    if (cell.Digit.IsKnown)
+                    if (board.TrySolveCell(x, y))
                     {
-                        continue;
-                    }
-                    int option;
-                    if (cell.Digit.HasSingleCandidate(out option))
-                    {
-                        cell.Digit.TryGuessValue(option);
                         found++;
                     }
                 }

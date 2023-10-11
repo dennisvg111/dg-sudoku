@@ -60,6 +60,17 @@ namespace DG.Sudoku
             return new Cell(Position.For(x, y), CellDigit.ForUnknown());
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="Cell"/>, with the given position and digit.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="digit"></param>
+        /// <returns></returns>
+        public static Cell With(Position position, CellDigit digit)
+        {
+            return new Cell(position, digit);
+        }
+
         /// <inheritdoc/>
         public override string ToString()
         {
