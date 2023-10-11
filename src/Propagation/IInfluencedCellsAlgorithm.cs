@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DG.Sudoku.SolvingStrategies.Data;
 
 namespace DG.Sudoku.Propagation
 {
@@ -13,6 +14,6 @@ namespace DG.Sudoku.Propagation
         /// <param name="board"></param>
         /// <param name="cell"></param>
         /// <returns></returns>
-        IEnumerable<Cell> GetInfluencedCells(Board board, Cell cell);
+        IEnumerable<Cell> GetInfluencedCells(ISolvingBoard board, Cell cell);
     }
 }

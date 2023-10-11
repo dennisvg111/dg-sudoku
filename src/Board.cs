@@ -1,5 +1,6 @@
 ﻿using DG.Common.Exceptions;
 using DG.Sudoku.CellData;
+using DG.Sudoku.SolvingStrategies.Data;
 using DG.Sudoku.Units;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace DG.Sudoku
     /// <summary>
     /// This class represents the board of a sudoku puzzle.
     /// </summary>
-    public class Board
+    public class Board : ISolvingBoard
     {
         /// <summary>
         /// <para>The length of the sides of a sudoku.</para>
@@ -52,27 +53,16 @@ namespace DG.Sudoku
             return new Board(_cells.Select(c => c.Copy()).ToArray());
         }
 
-        /// <summary>
-        /// Returns the cell at the given zero-indexed x and y coordinate.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public Cell this[int x, int y] => _cells[GetCellIndex(x, y)];
 
-        /// <summary>
-        /// Returns the cell at the given position.
-        /// </summary>
-        /// <param name="i"></param>
-        /// <returns></returns>
-        public Cell this[Position i] => this[i.X, i.Y];
+        /// <inheritdoc/>
+        public IEnumerable<Cell> GetAllCells()
+        {
+            return _cells;
+        }
 
-        /// <summary>
-        /// Returns all cells in the given column.
-        /// </summary>
-        /// <param name="column"></param>
-        /// <param name="exclude"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public IEnumerable<Cell> GetCellsInColumn(Column column, params Cell[] exclude)
         {
             int x = (int)column;
@@ -86,12 +76,7 @@ namespace DG.Sudoku
             }
         }
 
-        /// <summary>
-        /// Returns all cells in the given row.
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="exclude"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public IEnumerable<Cell> GetCellsInRow(Row row, params Cell[] exclude)
         {
             int y = (int)row;
@@ -105,16 +90,11 @@ namespace DG.Sudoku
             }
         }
 
-        /// <summary>
-        /// Returns all cells in the given box.
-        /// </summary>
-        /// <param name="region"></param>
-        /// <param name="exclude"></param>
-        /// <returns></returns>
-        public IEnumerable<Cell> GetCellsInBox(Box region, params Cell[] exclude)
+        /// <inheritdoc/>
+        public IEnumerable<Cell> GetCellsInBox(Box box, params Cell[] exclude)
         {
-            int offsetX = ((int)region % BoxSize) * BoxSize;
-            int offsetY = ((int)region / BoxSize) * BoxSize;
+            int offsetX = ((int)box % BoxSize) * BoxSize;
+            int offsetY = ((int)box / BoxSize) * BoxSize;
             for (int y = offsetY; y < offsetY + BoxSize; y++)
             {
                 for (int x = offsetX; x < offsetX + BoxSize; x++)
@@ -128,14 +108,7 @@ namespace DG.Sudoku
             }
         }
 
-        /// <summary>
-        /// Returns all cells in the unit specified by <paramref name="unit"/>, with the given zero-based index.
-        /// </summary>
-        /// <param name="unit"></param>
-        /// <param name="index"></param>
-        /// <param name="exclude"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <inheritdoc/>
         public IEnumerable<Cell> GetCellsInUnit(UnitType unit, int index, params Cell[] exclude)
         {
             switch (unit)
@@ -161,16 +134,6 @@ namespace DG.Sudoku
             var oldCell = _cells[index];
             var newDigit = oldCell.Digit.WithoutCandidate(candidate.Digit);
             _cells[index] = Cell.With(oldCell.Position, newDigit);
-        }
-
-        /// <summary>
-        /// <inheritdoc cref="TrySolveCell(int, int)"/>
-        /// </summary>
-        /// <param name="position"></param>
-        /// <returns></returns>
-        public bool TrySolveCell(Position position)
-        {
-            return TrySolveCell(position.X, position.Y);
         }
 
         /// <summary>

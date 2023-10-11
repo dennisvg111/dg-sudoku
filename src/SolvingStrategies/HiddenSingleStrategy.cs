@@ -1,4 +1,5 @@
 ﻿using DG.Sudoku.CellData;
+using DG.Sudoku.SolvingStrategies.Data;
 using DG.Sudoku.Units;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace DG.Sudoku.SolvingStrategies
         public Difficulty Difficulty => Difficulty.Easy;
 
         /// <inheritdoc/>
-        public IEnumerable<Candidate> FindCandidatesToRemove(Board board)
+        public IEnumerable<Candidate> FindCandidatesToRemove(ISolvingBoard board)
         {
             List<Candidate> valuesToRemove = new List<Candidate>();
             foreach (var unit in UnitTypes.All)

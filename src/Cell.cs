@@ -5,7 +5,7 @@ namespace DG.Sudoku
     /// <summary>
     /// Represents a cell in a sudoku board.
     /// </summary>
-    public class Cell
+    public readonly struct Cell
     {
         private readonly Position _position;
         private readonly CellDigit _digit;
