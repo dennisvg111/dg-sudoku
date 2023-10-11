@@ -1,5 +1,6 @@
 ﻿using DG.Common.Exceptions;
 using DG.Sudoku.CellData;
+using DG.Sudoku.SolvingStrategies.Data;
 using DG.Sudoku.Units;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace DG.Sudoku
     /// <summary>
     /// This class represents the board of a sudoku puzzle.
     /// </summary>
-    public class Board
+    public class Board : ISolvingBoard
     {
         /// <summary>
         /// <para>The length of the sides of a sudoku.</para>
@@ -52,72 +53,53 @@ namespace DG.Sudoku
             return new Board(_cells.Select(c => c.Copy()).ToArray());
         }
 
-        /// <summary>
-        /// Returns the cell at the given zero-indexed x and y coordinate.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        public Cell this[int x, int y] => _cells[y * SideLength + x];
+        /// <inheritdoc/>
+        public Cell this[int x, int y] => _cells[GetCellIndex(x, y)];
 
-        /// <summary>
-        /// Returns the cell at the given position.
-        /// </summary>
-        /// <param name="i"></param>
-        /// <returns></returns>
-        public Cell this[Position i] => this[i.X, i.Y];
-
-        /// <summary>
-        /// Returns all cells in the given column.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="exclude"></param>
-        /// <returns></returns>
-        public IEnumerable<Cell> GetCellsInColumn(Column x, params Cell[] exclude)
+        /// <inheritdoc/>
+        public IEnumerable<Cell> GetAllCells()
         {
+            return _cells;
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<Cell> GetCellsInColumn(Column column, params Cell[] exclude)
+        {
+            int x = (int)column;
             for (int y = 0; y < SideLength; y++)
             {
-                if (exclude.Any(c => c.Position.X == (int)x && c.Position.Y == y))
+                if (Array.Exists(exclude, c => c.Position.Y == y && c.Position.X == x))
                 {
                     continue;
                 }
-                yield return this[(int)x, y];
+                yield return this[x, y];
             }
         }
 
-        /// <summary>
-        /// Returns all cells in the given row.
-        /// </summary>
-        /// <param name="y"></param>
-        /// <param name="exclude"></param>
-        /// <returns></returns>
-        public IEnumerable<Cell> GetCellsInRow(Row y, params Cell[] exclude)
+        /// <inheritdoc/>
+        public IEnumerable<Cell> GetCellsInRow(Row row, params Cell[] exclude)
         {
+            int y = (int)row;
             for (int x = 0; x < SideLength; x++)
             {
-                if (exclude.Any(c => c.Position.Y == (int)y && c.Position.X == x))
+                if (Array.Exists(exclude, c => c.Position.Y == y && c.Position.X == x))
                 {
                     continue;
                 }
-                yield return this[x, (int)y];
+                yield return this[x, y];
             }
         }
 
-        /// <summary>
-        /// Returns all cells in the given box.
-        /// </summary>
-        /// <param name="region"></param>
-        /// <param name="exclude"></param>
-        /// <returns></returns>
-        public IEnumerable<Cell> GetCellsInBox(Box region, params Cell[] exclude)
+        /// <inheritdoc/>
+        public IEnumerable<Cell> GetCellsInBox(Box box, params Cell[] exclude)
         {
-            int offsetX = ((int)region % BoxSize) * BoxSize;
-            int offsetY = ((int)region / BoxSize) * BoxSize;
+            int offsetX = ((int)box % BoxSize) * BoxSize;
+            int offsetY = ((int)box / BoxSize) * BoxSize;
             for (int y = offsetY; y < offsetY + BoxSize; y++)
             {
                 for (int x = offsetX; x < offsetX + BoxSize; x++)
                 {
-                    if (exclude.Any(c => c.Position.Y == y && c.Position.X == x))
+                    if (Array.Exists(exclude, c => c.Position.Y == y && c.Position.X == x))
                     {
                         continue;
                     }
@@ -126,14 +108,7 @@ namespace DG.Sudoku
             }
         }
 
-        /// <summary>
-        /// Returns all cells in the unit specified by <paramref name="unit"/>, with the given zero-based index.
-        /// </summary>
-        /// <param name="unit"></param>
-        /// <param name="index"></param>
-        /// <param name="exclude"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <inheritdoc/>
         public IEnumerable<Cell> GetCellsInUnit(UnitType unit, int index, params Cell[] exclude)
         {
             switch (unit)
@@ -147,6 +122,45 @@ namespace DG.Sudoku
                 default:
                     throw new NotImplementedException("Cannot get cells in unit type " + unit + ".");
             }
+        }
+
+        /// <summary>
+        /// Replaces the cell at <see cref="Candidate.Position"/> with a cell without the given digit candidate.
+        /// </summary>
+        /// <param name="candidate"></param>
+        public void RemoveCandidate(Candidate candidate)
+        {
+            var index = GetCellIndex(candidate.Position.X, candidate.Position.Y);
+            var oldCell = _cells[index];
+            var newDigit = oldCell.Digit.WithoutCandidate(candidate.Digit);
+            _cells[index] = Cell.With(oldCell.Position, newDigit);
+        }
+
+        /// <summary>
+        /// Checks to see if the cell at this position is not marked as known, but only has a single valid candidate. If this is true, replaces the cell with a guessed cell and returns <see langword="true"/>. otherwise returns <see langword="false"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public bool TrySolveCell(int x, int y)
+        {
+            var index = GetCellIndex(x, y);
+            var oldCell = _cells[index];
+            if (oldCell.Digit.IsKnown)
+            {
+                return false;
+            }
+            if (!oldCell.Digit.HasSingleCandidate(out int candidate))
+            {
+                return false;
+            }
+            _cells[index] = Cell.With(Position.For(x, y), CellDigit.ForGuessed(candidate));
+            return true;
+        }
+
+        private static int GetCellIndex(int x, int y)
+        {
+            return y * SideLength + x;
         }
 
         #region serialization
@@ -185,8 +199,7 @@ namespace DG.Sudoku
         /// <exception cref="FormatException"></exception>
         public static Board Parse(string s)
         {
-            Board board;
-            if (TryParse(s, out board))
+            if (TryParse(s, out Board board))
             {
                 return board;
             }

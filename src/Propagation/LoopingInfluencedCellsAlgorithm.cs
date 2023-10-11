@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DG.Sudoku.SolvingStrategies.Data;
+using System.Collections.Generic;
 
 namespace DG.Sudoku.Propagation
 {
@@ -15,22 +16,19 @@ namespace DG.Sudoku.Propagation
         public static LoopingInfluencedCellsAlgorithm Instance => _instance;
 
         /// <inheritdoc/>
-        public IEnumerable<Cell> GetInfluencedCells(Board board, Cell cell)
+        public IEnumerable<Cell> GetInfluencedCells(ISolvingBoard board, Cell cell)
         {
-            for (int y = 0; y < Board.SideLength; y++)
+            foreach (var otherCell in board.GetAllCells())
             {
-                for (int x = 0; x < Board.SideLength; x++)
+                var otherPosition = otherCell.Position;
+                if (cell.Position == otherPosition)
                 {
-                    if (cell.Position.X == x && cell.Position.Y == y)
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    var otherCell = board[x, y];
-                    if (x == cell.Position.X || y == cell.Position.Y || otherCell.Position.Box == cell.Position.Box)
-                    {
-                        yield return otherCell;
-                    }
+                if (otherPosition.X == cell.Position.X || otherPosition.Y == cell.Position.Y || otherPosition.Box == cell.Position.Box)
+                {
+                    yield return otherCell;
                 }
             }
         }

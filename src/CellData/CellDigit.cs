@@ -7,7 +7,7 @@ namespace DG.Sudoku.CellData
     /// <summary>
     /// This class represents the possible candidates for a <see cref="Cell"/>.
     /// </summary>
-    public sealed class CellDigit
+    public readonly struct CellDigit
     {
         /// <summary>
         /// 9
@@ -22,12 +22,12 @@ namespace DG.Sudoku.CellData
         // Digit Unknown state could be any value
         private const int _unkownMask = 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4 | 1 << 5 | 1 << 6 | 1 << 7 | 1 << 8 | 1 << 9;
 
-        private short _bits;
+        private readonly short _bits;
 
         /// <summary>
         /// A masked version of <see cref="_bits"/> to only contain bits that indicate the value.
         /// </summary>
-        private short digitBits => (short)(_bits & ~_knownMask & ~_givenMask & ~_guessMask);
+        private readonly short _digitBits;
 
         /// <summary>
         /// Indicates if this value is known.
@@ -37,12 +37,12 @@ namespace DG.Sudoku.CellData
         /// <summary>
         /// Returns the known value of this cell, otherwise 0.
         /// </summary>
-        public int KnownValue => IsKnown ? Log2n(digitBits) : 0;
+        public int KnownValue => IsKnown ? Log2n(_digitBits) : 0;
 
         /// <summary>
         /// Indicates this cell has no more values it could possibly be.
         /// </summary>
-        public bool IsExhausted => digitBits == 0;
+        public bool IsExhausted => _digitBits == 0;
 
         /// <summary>
         /// Creates a new instance of <see cref="CellDigit"/>.
@@ -51,6 +51,7 @@ namespace DG.Sudoku.CellData
         private CellDigit(short bits)
         {
             _bits = bits;
+            _digitBits = (short)(_bits & ~_knownMask & ~_givenMask & ~_guessMask);
         }
 
         /// <summary>
@@ -66,10 +67,11 @@ namespace DG.Sudoku.CellData
         /// Excludes the given <paramref name="candidate"/> from the possible digits this cell can be.
         /// </summary>
         /// <param name="candidate"></param>
-        public void RemoveCandidate(int candidate)
+        public CellDigit WithoutCandidate(int candidate)
         {
             // Mask-out the excluded value
-            _bits &= (short)~(1 << candidate);
+            var bitsWithoutCandidate = _bits & (short)~(1 << candidate);
+            return new CellDigit((short)bitsWithoutCandidate);
         }
 
         /// <summary>
@@ -98,7 +100,7 @@ namespace DG.Sudoku.CellData
         /// <returns></returns>
         public bool CouldBe(int candidate)
         {
-            return (_bits & 1 << candidate) != 0;
+            return CouldBe(_bits, candidate);
         }
 
         private static readonly ConcurrentDictionary<short, IReadOnlyList<int>> cachedOptions = new ConcurrentDictionary<short, IReadOnlyList<int>>();
@@ -108,9 +110,17 @@ namespace DG.Sudoku.CellData
         /// <returns></returns>
         public IReadOnlyList<int> GetCandidates()
         {
-            return cachedOptions.GetOrAdd(digitBits, (b) =>
+            return cachedOptions.GetOrAdd(_digitBits, (b) =>
             {
-                return GetCandidatesWhere(d => true);
+                List<int> options = new List<int>();
+                for (int i = 1; i <= MaxValue; i++)
+                {
+                    if (CouldBe(b, i))
+                    {
+                        options.Add(i);
+                    }
+                }
+                return options;
             });
         }
 
@@ -144,29 +154,13 @@ namespace DG.Sudoku.CellData
         public bool HasSingleCandidate(out int candidate)
         {
             candidate = 0;
-            var bitsToCheck = digitBits;
+            var bitsToCheck = _digitBits;
             bool singleOption = bitsToCheck > 0 && (bitsToCheck & bitsToCheck - 1) == 0;
             if (!singleOption)
             {
                 return false;
             }
             candidate = Log2n(bitsToCheck);
-            return true;
-        }
-
-        /// <summary>
-        /// Sets this digit to the given value (if <see cref="IsKnown"/> is currently false), and changes <see cref="Type"/> to <see cref="DigitKnowledge.Guessed"/>.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public bool TryGuessValue(int value)
-        {
-            if (IsKnown && value != KnownValue)
-            {
-                return false;
-            }
-            // Set bits to reflect known value of specified kind
-            _bits = (short)(1 << value | _knownMask | _guessMask);
             return true;
         }
 
@@ -181,12 +175,51 @@ namespace DG.Sudoku.CellData
         }
 
         /// <summary>
+        /// Creates a new instance of <see cref="CellDigit"/> for a specific digit.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static CellDigit ForGuessed(int value)
+        {
+            return new CellDigit((short)(1 << value | _knownMask | _guessMask));
+        }
+
+        /// <summary>
         /// Creates a new instance of <see cref="CellDigit"/> where the underlying digit is not known.
         /// </summary>
         /// <returns></returns>
         public static CellDigit ForUnknown()
         {
             return new CellDigit(_unkownMask);
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="CellDigit"/> where the underlying digit is not known, but can only be one of the given candidates.
+        /// </summary>
+        /// <param name="candidates"></param>
+        /// <returns></returns>
+        public static CellDigit WithCandidates(params int[] candidates)
+        {
+            short bits = 0;
+            if (candidates != null)
+            {
+                foreach (var candidate in candidates)
+                {
+                    bits |= (short)(1 << candidate);
+                }
+            }
+            return new CellDigit(bits);
+        }
+
+        /// <summary>
+        /// Indicates if the given <paramref name="bits"/> has the bit set for a specific <paramref name="candidate"/>.
+        /// </summary>
+        /// <param name="bits"></param>
+        /// <param name="candidate"></param>
+        /// <returns></returns>
+        private static bool CouldBe(short bits, int candidate)
+        {
+            return (bits & 1 << candidate) != 0;
         }
 
         private static int Log2n(int n)

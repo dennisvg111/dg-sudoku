@@ -1,4 +1,5 @@
 ﻿using DG.Sudoku.SolvingStrategies;
+using DG.Sudoku.SolvingStrategies.Data;
 using System.Collections.Generic;
 
 namespace DG.Sudoku.Propagation
@@ -33,7 +34,7 @@ namespace DG.Sudoku.Propagation
         public Difficulty Difficulty => Difficulty.Easy;
 
         /// <inheritdoc/>
-        public IEnumerable<Candidate> FindCandidatesToRemove(Board board)
+        public IEnumerable<Candidate> FindCandidatesToRemove(ISolvingBoard board)
         {
             for (int x = 0; x < Board.SideLength; x++)
             {

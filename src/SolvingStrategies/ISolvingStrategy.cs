@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DG.Sudoku.SolvingStrategies.Data;
 
 namespace DG.Sudoku.SolvingStrategies
 {
@@ -22,6 +23,6 @@ namespace DG.Sudoku.SolvingStrategies
         /// </summary>
         /// <param name="board"></param>
         /// <returns></returns>
-        IEnumerable<Candidate> FindCandidatesToRemove(Board board);
+        IEnumerable<Candidate> FindCandidatesToRemove(ISolvingBoard board);
     }
 }

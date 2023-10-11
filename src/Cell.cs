@@ -5,7 +5,7 @@ namespace DG.Sudoku
     /// <summary>
     /// Represents a cell in a sudoku board.
     /// </summary>
-    public class Cell
+    public readonly struct Cell
     {
         private readonly Position _position;
         private readonly CellDigit _digit;
@@ -58,6 +58,17 @@ namespace DG.Sudoku
         public static Cell ForUnkown(int x, int y)
         {
             return new Cell(Position.For(x, y), CellDigit.ForUnknown());
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="Cell"/>, with the given position and digit.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="digit"></param>
+        /// <returns></returns>
+        public static Cell With(Position position, CellDigit digit)
+        {
+            return new Cell(position, digit);
         }
 
         /// <inheritdoc/>

@@ -1,4 +1,5 @@
-﻿using DG.Sudoku.Units;
+﻿using DG.Common;
+using DG.Sudoku.Units;
 using System;
 
 namespace DG.Sudoku
@@ -6,7 +7,7 @@ namespace DG.Sudoku
     /// <summary>
     /// This class represents the zero-indexed position of a cell.
     /// </summary>
-    public sealed class Position
+    public readonly struct Position : IEquatable<Position>
     {
         private readonly int _x;
         private readonly int _y;
@@ -69,6 +70,47 @@ namespace DG.Sudoku
                 default:
                     throw new NotImplementedException($"Method {nameof(GetIndex)} is not implemented for unit type {unit}.");
             }
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            return obj is Position && Equals((Position)obj);
+        }
+
+        /// <inheritdoc/>
+        public bool Equals(Position other)
+        {
+            return _x == other._x && _y == other._y;
+        }
+
+        /// <summary>
+        /// Indicates if two positions are equal to eachother.
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static bool operator ==(Position left, Position right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>
+        /// Indicates if two positions are not equal to eachother.
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static bool operator !=(Position left, Position right)
+        {
+            return !left.Equals(right);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return HashCode.Of(_x)
+                .And(_y);
         }
 
         /// <summary>

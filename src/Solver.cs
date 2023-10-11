@@ -24,7 +24,7 @@ namespace DG.Sudoku
         }
 
         /// <summary>
-        /// Executes the <see cref="NextStep(Board)"/> method <paramref name="n"/> amount of times.
+        /// Executes the <see cref="TryNextStep(Board)"/> method <paramref name="n"/> amount of times.
         /// </summary>
         /// <param name="board"></param>
         /// <param name="n"></param>
@@ -32,7 +32,7 @@ namespace DG.Sudoku
         {
             for (int i = 0; i < n; i++)
             {
-                NextStep(board);
+                TryNextStep(board);
             }
         }
 
@@ -41,14 +41,14 @@ namespace DG.Sudoku
         /// <para>This always happens 1 step at a time. A step can be any of the following:
         /// <list type="number">
         /// <item>Finding one or multiple cells have been solved (only 1 possible candidate).</item>
-        /// <item>Eliminating candidates by propagating solved cells using an instance of <see cref="PropagationSolver"/>.</item>
-        /// <item>Eliminating candidates using a strategy in the <see cref="SolvingPipeline"/>.</item>
+        /// <item>Eliminating candidates by propagating solved cells using a <see cref="PropagationSolver"/>.</item>
+        /// <item>Eliminating candidates using the first possible strategy in the <see cref="SolvingPipeline"/>.</item>
         /// </list>
         /// </para>
         /// </summary>
         /// <param name="board"></param>
         /// <returns></returns>
-        public bool NextStep(Board board)
+        public bool TryNextStep(Board board)
         {
             int found = CheckForSolved(board);
             if (found > 0)
@@ -62,8 +62,7 @@ namespace DG.Sudoku
                 return true;
             }
 
-            string strategy;
-            if (_pipeline.TryPipeline(board, out strategy, out candidatesToRemove))
+            if (_pipeline.TryPipeline(board, out string strategy, out candidatesToRemove))
             {
                 RemoveCandidates(board, candidatesToRemove);
                 return true;
@@ -77,7 +76,7 @@ namespace DG.Sudoku
 
             foreach (var value in candidates)
             {
-                board[value.Position].Digit.RemoveCandidate(value.Digit);
+                board.RemoveCandidate(value);
             }
         }
 
@@ -93,15 +92,8 @@ namespace DG.Sudoku
             {
                 for (int y = 0; y < Board.SideLength; y++)
                 {
-                    var cell = board[x, y];
-                    if (cell.Digit.IsKnown)
+                    if (board.TrySolveCell(x, y))
                     {
-                        continue;
-                    }
-                    int option;
-                    if (cell.Digit.HasSingleCandidate(out option))
-                    {
-                        cell.Digit.TryGuessValue(option);
                         found++;
                     }
                 }
