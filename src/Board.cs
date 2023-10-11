@@ -236,8 +236,7 @@ namespace DG.Sudoku
         /// <exception cref="FormatException"></exception>
         public static Board Parse(string s)
         {
-            Board board;
-            if (TryParse(s, out board))
+            if (TryParse(s, out Board board))
             {
                 return board;
             }

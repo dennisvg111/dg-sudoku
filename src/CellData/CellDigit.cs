@@ -27,7 +27,7 @@ namespace DG.Sudoku.CellData
         /// <summary>
         /// A masked version of <see cref="_bits"/> to only contain bits that indicate the value.
         /// </summary>
-        private short digitBits => (short)(_bits & ~_knownMask & ~_givenMask & ~_guessMask);
+        private readonly short _digitBits;
 
         /// <summary>
         /// Indicates if this value is known.
@@ -37,12 +37,12 @@ namespace DG.Sudoku.CellData
         /// <summary>
         /// Returns the known value of this cell, otherwise 0.
         /// </summary>
-        public int KnownValue => IsKnown ? Log2n(digitBits) : 0;
+        public int KnownValue => IsKnown ? Log2n(_digitBits) : 0;
 
         /// <summary>
         /// Indicates this cell has no more values it could possibly be.
         /// </summary>
-        public bool IsExhausted => digitBits == 0;
+        public bool IsExhausted => _digitBits == 0;
 
         /// <summary>
         /// Creates a new instance of <see cref="CellDigit"/>.
@@ -51,6 +51,7 @@ namespace DG.Sudoku.CellData
         private CellDigit(short bits)
         {
             _bits = bits;
+            _digitBits = (short)(_bits & ~_knownMask & ~_givenMask & ~_guessMask);
         }
 
         /// <summary>
@@ -109,7 +110,7 @@ namespace DG.Sudoku.CellData
         /// <returns></returns>
         public IReadOnlyList<int> GetCandidates()
         {
-            return cachedOptions.GetOrAdd(digitBits, (b) =>
+            return cachedOptions.GetOrAdd(_digitBits, (b) =>
             {
                 List<int> options = new List<int>();
                 for (int i = 1; i <= MaxValue; i++)
@@ -153,7 +154,7 @@ namespace DG.Sudoku.CellData
         public bool HasSingleCandidate(out int candidate)
         {
             candidate = 0;
-            var bitsToCheck = digitBits;
+            var bitsToCheck = _digitBits;
             bool singleOption = bitsToCheck > 0 && (bitsToCheck & bitsToCheck - 1) == 0;
             if (!singleOption)
             {

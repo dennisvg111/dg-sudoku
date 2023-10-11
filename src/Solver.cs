@@ -62,8 +62,7 @@ namespace DG.Sudoku
                 return true;
             }
 
-            string strategy;
-            if (_pipeline.TryPipeline(board, out strategy, out candidatesToRemove))
+            if (_pipeline.TryPipeline(board, out string strategy, out candidatesToRemove))
             {
                 RemoveCandidates(board, candidatesToRemove);
                 return true;
