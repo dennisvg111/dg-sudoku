@@ -73,6 +73,12 @@ namespace DG.Sudoku
         }
 
         /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            return obj is Position && Equals((Position)obj);
+        }
+
+        /// <inheritdoc/>
         public bool Equals(Position other)
         {
             return _x == other._x && _y == other._y;
