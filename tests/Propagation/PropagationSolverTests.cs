@@ -34,7 +34,7 @@ namespace DG.Sudoku.Tests.Propagation
         }
 
         [Fact]
-        public void FindCandidatesToRemove_ShouldNotOutsideBoundary()
+        public void FindCandidatesToRemove_ShouldMatchAnyPositionProperty()
         {
             var initial = Position.For(1, 3);
 
