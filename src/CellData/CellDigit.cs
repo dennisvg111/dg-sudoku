@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace DG.Sudoku.CellData
 {
@@ -55,15 +56,6 @@ namespace DG.Sudoku.CellData
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="CellDigit"/> with the same digit knowledge.
-        /// </summary>
-        /// <returns></returns>
-        public CellDigit Copy()
-        {
-            return new CellDigit(_bits);
-        }
-
-        /// <summary>
         /// Excludes the given <paramref name="candidate"/> from the possible digits this cell can be.
         /// </summary>
         /// <param name="candidate"></param>
@@ -98,6 +90,7 @@ namespace DG.Sudoku.CellData
         /// </summary>
         /// <param name="candidate"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool CouldBe(int candidate)
         {
             return CouldBe(_bits, candidate);
@@ -217,6 +210,7 @@ namespace DG.Sudoku.CellData
         /// <param name="bits"></param>
         /// <param name="candidate"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool CouldBe(short bits, int candidate)
         {
             return (bits & 1 << candidate) != 0;

@@ -28,7 +28,7 @@ namespace DG.Sudoku.Tests.CellData
         }
 
         [Fact]
-        public void WithoutCandidate_Works()
+        public void WithoutCandidate_ChangesCouldBe()
         {
             var value = CellDigit.ForUnknown()
                 .WithoutCandidate(1)
@@ -55,7 +55,7 @@ namespace DG.Sudoku.Tests.CellData
         }
 
         [Fact]
-        public void WithCandidates_Works()
+        public void WithCandidates_SetsCouldBe()
         {
             var value = CellDigit.WithCandidates(1, 5, 9);
 

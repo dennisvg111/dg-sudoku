@@ -5,6 +5,7 @@ using DG.Sudoku.Units;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace DG.Sudoku
 {
@@ -26,7 +27,10 @@ namespace DG.Sudoku
 
         private const int BoardSize = SideLength * SideLength;
 
-        private readonly Cell[] _cells;
+        /// <summary>
+        /// The cells of this board.
+        /// </summary>
+        protected readonly Cell[] _cells;
 
         /// <summary>
         /// Initializes a new instance of <see cref="Board"/> where all cells are unknown.
@@ -37,24 +41,15 @@ namespace DG.Sudoku
         /// Initializes a new instance of <see cref="Board"/> with the given cells.
         /// </summary>
         /// <param name="cells"></param>
-        private Board(Cell[] cells)
+        protected Board(Cell[] cells)
         {
             ThrowIf.Collection(cells, nameof(cells)).IsEmpty();
             ThrowIf.Collection(cells, nameof(cells)).CountOtherThan(BoardSize);
             _cells = cells;
         }
 
-        /// <summary>
-        /// Creates a copy of this board.
-        /// </summary>
-        /// <returns></returns>
-        public Board Copy()
-        {
-            return new Board(_cells.Select(c => c.Copy()).ToArray());
-        }
-
         /// <inheritdoc/>
-        public Cell this[int x, int y] => _cells[GetCellIndex(x, y)];
+        public Cell this[int x, int y] => _cells[ConvertToArrayIndex(x, y)];
 
         /// <inheritdoc/>
         public IEnumerable<Cell> GetAllCells()
@@ -130,7 +125,7 @@ namespace DG.Sudoku
         /// <param name="candidate"></param>
         public void RemoveCandidate(Candidate candidate)
         {
-            var index = GetCellIndex(candidate.Position.X, candidate.Position.Y);
+            var index = ConvertToArrayIndex(candidate.Position.X, candidate.Position.Y);
             var oldCell = _cells[index];
             var newDigit = oldCell.Digit.WithoutCandidate(candidate.Digit);
             _cells[index] = Cell.With(oldCell.Position, newDigit);
@@ -144,7 +139,7 @@ namespace DG.Sudoku
         /// <returns></returns>
         public bool TrySolveCell(int x, int y)
         {
-            var index = GetCellIndex(x, y);
+            var index = ConvertToArrayIndex(x, y);
             var oldCell = _cells[index];
             if (oldCell.Digit.IsKnown)
             {
@@ -158,7 +153,14 @@ namespace DG.Sudoku
             return true;
         }
 
-        private static int GetCellIndex(int x, int y)
+        /// <summary>
+        /// Converts the given x and y index to the corresponding index in <see cref="_cells"/>.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected static int ConvertToArrayIndex(int x, int y)
         {
             return y * SideLength + x;
         }

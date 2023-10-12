@@ -46,7 +46,7 @@ namespace DG.Sudoku.Propagation
                         var cells = _algorithm.GetInfluencedCells(board, cell);
                         foreach (var otherCell in cells)
                         {
-                            if (!otherCell.Digit.CouldBe(cell.Digit.KnownValue))
+                            if (otherCell.Position == cell.Position || !otherCell.Digit.CouldBe(cell.Digit.KnownValue))
                             {
                                 continue;
                             }

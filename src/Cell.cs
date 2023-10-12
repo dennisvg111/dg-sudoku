@@ -28,16 +28,6 @@ namespace DG.Sudoku
         }
 
         /// <summary>
-        /// Creates a copy of this cell.
-        /// </summary>
-        /// <returns></returns>
-        public Cell Copy()
-        {
-            //position is read-only so we don't need to copy it.
-            return new Cell(_position, _digit.Copy());
-        }
-
-        /// <summary>
         /// Initializes a new instance of <see cref="Cell"/>, with the given position and digit, and with <see cref="DigitKnowledge.Given"/>.
         /// </summary>
         /// <param name="x"></param>
