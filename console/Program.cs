@@ -15,12 +15,7 @@ namespace DG.Sudoku.Console
         {
             Output.ForegroundColor = defaultColor;
 
-            string input = "-8--9--3--3-----699-2-63158-2-8-459-8519-7-463946-587-563-4-9872------15-1--5--2-";
-            if (!Board.TryParse(input, out Board board))
-            {
-                Output.WriteLine("Could not parse board from given input");
-                Output.WriteLine("\"" + input + "\"");
-            }
+            var board = Board.NakedPair;
 
             var pipeline = SolvingPipeline
                 .With(new HiddenSingleStrategy());
