@@ -15,7 +15,7 @@ namespace DG.Sudoku.Console
         {
             Output.ForegroundColor = defaultColor;
 
-            string input = "2...7..38.....6.7.3...4.6....8.2.7..1.......6..7.3.4....4.8...9.6.4.....91..6...2";
+            string input = "-8--9--3--3-----699-2-63158-2-8-459-8519-7-463946-587-563-4-9872------15-1--5--2-";
             if (!Board.TryParse(input, out Board board))
             {
                 Output.WriteLine("Could not parse board from given input");
